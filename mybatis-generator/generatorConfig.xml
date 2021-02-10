@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+        PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <context id="MysqlContext" targetRuntime="MyBatis3Simple" defaultModelType="flat">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+
+        <!-- 通用 mapper 所在目录 -->
+        <plugin type="tk.mybatis.mapper.generator.MapperPlugin">
+            <!-- tk mapper 生成时使用插件方式为每个生成的 mapper 继承 tk mapper 的类
+                 需要注意的是：该 mapper 是需要你拷贝到你的 mapper 项目中去的，但是还不能让 项目中的 tk mapper 扫描到该类
+             -->
+            <property name="mappers" value="cn.mrcode.foodiedev.my.mapper.MyMapper"/>
+        </plugin>
+
+<!--        &lt;!&ndash; 指定自定义的注释添加实现 &ndash;&gt;-->
+<!--        <commentGenerator type="cn.mrcode.mybatis.tkmappter.generator.MyCommentGenerator">-->
+<!--            &lt;!&ndash; 是否去除自动生成的注释 true：是 ： false:否 &ndash;&gt;-->
+<!--            <property name="suppressAllComments" value="false"/>-->
+<!--        </commentGenerator>-->
+
+
+        <jdbcConnection driverClass="com.mysql.jdbc.Driver"
+                        connectionURL="jdbc:mysql://localhost:3306/foodie-shop-dev?useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false"
+                        userId="root"
+                        password="root">
+        </jdbcConnection>
+
+        <!-- 对应生成的 pojo 所在包 -->
+        <javaModelGenerator targetPackage="cn.mrcode.foodiedev.pojo" targetProject="src/main/java"/>
+
+		<!-- 对应生成的mapper所在目录 -->
+        <sqlMapGenerator targetPackage="mapper" targetProject="src/main/resources"/>
+
+		<!-- 配置mapper对应的java映射 -->
+        <javaClientGenerator targetPackage="cn.mrcode.foodiedev.mapper" targetProject="src/main/java" type="XMLMAPPER"/>
+
+        <!-- 数据库表 -->
+		<table tableName="carousel"></table>
+		<table tableName="category"></table>
+		<table tableName="users"></table>
+		<table tableName="user_address"></table>
+		<table tableName="items"></table>
+		<table tableName="items_img"></table>
+		<table tableName="items_spec"></table>
+		<table tableName="items_param"></table>
+		<table tableName="items_comments"></table>
+		<table tableName="orders"></table>
+		<table tableName="order_items"></table>
+		<table tableName="order_status"></table>
+
+    </context>
+</generatorConfiguration>
