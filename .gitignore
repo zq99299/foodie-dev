@@ -1,6 +1,7 @@
 .gradle
 /build/
 */target/
+/logs/
 
 ### STS ###
 .apt_generated

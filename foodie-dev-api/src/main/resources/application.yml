@@ -50,7 +50,4 @@ mapper:
   not-empty: false
   identity: MYSQL
 
-debug: true
-logging:
-  level:
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: trace
+debug: false
