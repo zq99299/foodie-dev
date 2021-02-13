@@ -10,3 +10,12 @@ Content-Type: application/json
   "password": "123456",
   "confirmPassword": "123456"
 }
+
+### 登录
+POST http://localhost:8088/passport/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "123456"
+}

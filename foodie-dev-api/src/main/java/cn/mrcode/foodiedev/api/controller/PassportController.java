@@ -1,6 +1,9 @@
 package cn.mrcode.foodiedev.api.controller;
 
+import cn.mrcode.foodiedev.common.util.CookieUtils;
 import cn.mrcode.foodiedev.common.util.JSONResult;
+import cn.mrcode.foodiedev.common.util.JsonUtils;
+import cn.mrcode.foodiedev.common.util.MD5Utils;
 import cn.mrcode.foodiedev.pojo.Users;
 import cn.mrcode.foodiedev.pojo.bo.UserBO;
 import cn.mrcode.foodiedev.service.UserService;
@@ -12,6 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @Api(value = "注册登录", tags = {"用户注册登录的相关接口"}) // API 分组
 @RestController
@@ -42,7 +48,9 @@ public class PassportController {
 
     @ApiOperation(value = "用户注册", notes = "用户用户注册", httpMethod = "POST")
     @PostMapping("/regist")
-    public JSONResult regist(@RequestBody UserBO userBO) {
+    public JSONResult regist(@RequestBody UserBO userBO,
+                             HttpServletRequest request,
+                             HttpServletResponse response) {
         String username = userBO.getUsername();
         String password = userBO.getPassword();
         String confirmPassword = userBO.getConfirmPassword();
@@ -67,6 +75,57 @@ public class PassportController {
         }
         // 4. 实现注册
         Users user = userService.createUser(userBO);
+
+        // 脱敏信息
+        setNullProperty(user);
+
+        // 设置 cookie
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+
         return JSONResult.ok(user);
+    }
+
+    @ApiOperation(value = "用户登录")
+    @PostMapping("/login")
+    public JSONResult login(@RequestBody UserBO userBO,
+                            HttpServletRequest request,
+                            HttpServletResponse response) throws Exception {
+        String username = userBO.getUsername();
+        String password = userBO.getPassword();
+        // 0. 判断用户名和密码必须不为空
+        if (StringUtils.isBlank(username) ||
+                StringUtils.isBlank(password)) {
+            return JSONResult.errorMsg("用户名或密码不能为空");
+        }
+        password = MD5Utils.getMD5Str(password);
+        Users user = userService.queryUserForLogin(username, password);
+        if (user == null) {
+            return JSONResult.errorMsg("用户名或密码不正确");
+        }
+
+        // 脱敏信息
+        setNullProperty(user);
+
+        // 设置 cookie
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+
+        return JSONResult.ok(user);
+    }
+
+    /**
+     * <pre>
+     * 由于目前响应对象是 数据库实体对象，不适用适用 @JsonIgone 直接抹去不显示该字段信息
+     * 直接重置为空
+     * </pre>
+     *
+     * @param user
+     */
+    private void setNullProperty(Users user) {
+        user.setPassword(null);
+        user.setMobile(null);
+        user.setEmail(null);
+        user.setCreatedTime(null);
+        user.setUpdatedTime(null);
+        user.setBirthday(null);
     }
 }

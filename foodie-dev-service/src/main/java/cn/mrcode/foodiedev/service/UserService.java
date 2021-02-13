@@ -19,4 +19,6 @@ public interface UserService {
      * @return
      */
     Users createUser(UserBO userBO);
+
+    Users queryUserForLogin(String username, String passwod);
 }
