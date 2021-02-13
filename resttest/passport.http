@@ -1,0 +1,12 @@
+### 判断用户是否存在
+GET http://localhost:8088/passport/usernameIsExist?username=mrcode
+
+### 注册
+POST http://localhost:8088/passport/regist
+Content-Type: application/json
+
+{
+  "username": "mrcode",
+  "password": "123456",
+  "confirmPassword": "123456"
+}
