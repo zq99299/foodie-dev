@@ -4,18 +4,27 @@ import cn.mrcode.foodiedev.common.util.JSONResult;
 import cn.mrcode.foodiedev.pojo.Users;
 import cn.mrcode.foodiedev.pojo.bo.UserBO;
 import cn.mrcode.foodiedev.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+@Api(value = "注册登录", tags = {"用户注册登录的相关接口"}) // API 分组
 @RestController
 @RequestMapping("/passport")
 public class PassportController {
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "用户名是否存在", notes = "判断用户名是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "username", value = "用户名")
+    })
     public JSONResult usernameIsExist(@RequestParam String username) {
         // 1. 判断用户名不能为空
         if (StringUtils.isBlank(username)) {
@@ -31,6 +40,7 @@ public class PassportController {
         return JSONResult.ok();
     }
 
+    @ApiOperation(value = "用户注册", notes = "用户用户注册", httpMethod = "POST")
     @PostMapping("/regist")
     public JSONResult regist(@RequestBody UserBO userBO) {
         String username = userBO.getUsername();
