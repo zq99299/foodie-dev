@@ -51,6 +51,7 @@
 		<table tableName="orders"></table>
 		<table tableName="order_items"></table>
 		<table tableName="order_status"></table>
+		<table tableName="stu"></table>
 
     </context>
 </generatorConfiguration>
