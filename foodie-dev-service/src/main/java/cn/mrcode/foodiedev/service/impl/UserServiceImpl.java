@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     /**
      * 用户默认的头像图片
      */
-    public static final String USER_FACE = "http://localhost:900/xx.jpg";
+    public static final String USER_FACE = "http://122.152.205.72:88/group1/M00/00/05/CpoxxFw_8_qAIlFXAAAcIhVPdSg994.png";
 
     /**
      * id 生成器，需要在启动类上使用 @SpringBootApplication(scanBasePackages = {"cn.mrcode.foodiedev", "org.n3r.idworker"}) 扫描
