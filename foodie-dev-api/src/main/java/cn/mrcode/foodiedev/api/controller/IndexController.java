@@ -5,6 +5,7 @@ import cn.mrcode.foodiedev.common.util.JSONResult;
 import cn.mrcode.foodiedev.pojo.Carousel;
 import cn.mrcode.foodiedev.pojo.Category;
 import cn.mrcode.foodiedev.pojo.vo.CategoryVO;
+import cn.mrcode.foodiedev.pojo.vo.NewItemsVo;
 import cn.mrcode.foodiedev.service.CarouselService;
 import cn.mrcode.foodiedev.service.CategoryService;
 import io.swagger.annotations.Api;
@@ -51,6 +52,15 @@ public class IndexController {
             @ApiParam(name = "rootCatId", value = "一级分类 ID", required = true)
             @PathVariable Integer rootCatId) {
         List<CategoryVO> list = categoryService.getSubCatList(rootCatId);
+        return JSONResult.ok(list);
+    }
+
+    @ApiOperation(value = "获取一级分类下的最新 6 个商品")
+    @GetMapping("/sixNewItems/{rootCatId}")
+    public JSONResult sixNewItems(
+            @ApiParam(name = "rootCatId", value = "一级分类 ID", required = true)
+            @PathVariable Integer rootCatId) {
+        List<NewItemsVo> list = categoryService.getSixNewItemsLazy(rootCatId);
         return JSONResult.ok(list);
     }
 }

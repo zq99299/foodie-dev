@@ -5,6 +5,7 @@ import cn.mrcode.foodiedev.mapper.CategoryMapperCustom;
 import cn.mrcode.foodiedev.pojo.Carousel;
 import cn.mrcode.foodiedev.pojo.Category;
 import cn.mrcode.foodiedev.pojo.vo.CategoryVO;
+import cn.mrcode.foodiedev.pojo.vo.NewItemsVo;
 import cn.mrcode.foodiedev.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -40,5 +42,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryVO> getSubCatList(Integer rootCatId) {
         return categoryMapperCustom.getSubCatList(rootCatId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public List<NewItemsVo> getSixNewItemsLazy(Integer rootCatId) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("rootCatId", rootCatId);
+        return categoryMapperCustom.getSixNewItemsLazy(map);
     }
 }

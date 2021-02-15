@@ -2,6 +2,7 @@ package cn.mrcode.foodiedev.service;
 
 import cn.mrcode.foodiedev.pojo.Category;
 import cn.mrcode.foodiedev.pojo.vo.CategoryVO;
+import cn.mrcode.foodiedev.pojo.vo.NewItemsVo;
 
 import java.util.List;
 
@@ -24,4 +25,12 @@ public interface CategoryService {
      * @return
      */
     List<CategoryVO> getSubCatList(Integer rootCatId);
+
+    /**
+     * 查询首页每个一级分类下的 6 条最新商品数据
+     *
+     * @param rootCatId
+     * @return
+     */
+    List<NewItemsVo> getSixNewItemsLazy(Integer rootCatId);
 }

@@ -13,6 +13,18 @@
             <result column="subFatherId" property="subFatherId"/>
         </collection>
     </resultMap>
+    <resultMap id="myNewItemVo" type="cn.mrcode.foodiedev.pojo.vo.NewItemsVo">
+        <id column="rootCatId" property="rootCatId"/>
+        <result column="rootCatName" property="rootCatName"/>
+        <result column="slogan" property="slogan"/>
+        <result column="catImage" property="catImage"/>
+        <result column="bgColor" property="bgColor"/>
+        <collection property="simpleItemList" ofType="cn.mrcode.foodiedev.pojo.vo.SimpleItemVO">
+            <id column="itemId" property="itemId"/>
+            <result column="itemName" property="itemName"/>
+            <result column="itemUrl" property="itemUrl"/>
+        </collection>
+    </resultMap>
     <select id="getSubCatList" resultMap="myCategoryVO" parameterType="int">
         select f.id        as id,
                f.name      as name,
@@ -24,5 +36,23 @@
         from category f
                  left join category c on f.id = c.father_id
         where f.father_id = #{rootCatId}
+    </select>
+    <select id="getSixNewItemsLazy" resultMap="myNewItemVo" parameterType="map">
+        select f.id           as rootCatId,
+               f.name         as rootCatName,
+               f.slogan       as slogan,
+               f.cat_image    as catImage,
+               f.bg_color     as bgColor,
+               i.id           as itemId,
+               i.item_name    as itemName,
+               ii.url         as itemUrl,
+               i.created_time as createdTime
+        from category f
+                 left join items i on f.id = i.root_cat_id
+                 left join items_img ii on i.id = ii.item_id
+        where f.type = 1     -- 一级分类
+          and i.root_cat_id = #{paramsMap.rootCatId}
+          and ii.is_main = 1 -- 商品主图
+        order by i.created_time desc limit 0,6
     </select>
 </mapper>
