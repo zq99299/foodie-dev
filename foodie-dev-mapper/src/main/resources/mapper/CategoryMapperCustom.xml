@@ -30,6 +30,7 @@
                f.name      as name,
                f.type      as type,
                f.father_id as fatherId,
+               c.id        as subId,
                c.name      as subName,
                c.type      as subType,
                c.father_id as subFatherId
