@@ -8,6 +8,7 @@ import cn.mrcode.foodiedev.pojo.ItemsParam;
 import cn.mrcode.foodiedev.pojo.ItemsSpec;
 import cn.mrcode.foodiedev.pojo.vo.CommentLevelCountsVO;
 import cn.mrcode.foodiedev.pojo.vo.ItemInfoVO;
+import cn.mrcode.foodiedev.pojo.vo.ShopcartVO;
 import cn.mrcode.foodiedev.service.ItemService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -158,5 +159,21 @@ public class ItemsController extends BaseController {
                 pageSize);
 
         return JSONResult.ok(grid);
+    }
+
+    // 用于用户长时间未登录网站，刷新购物车中的数据（主要是商品价格），类似京东淘宝
+    @ApiOperation(value = "根据商品规格 ids 查找最新的商品数据", notes = "根据商品规格 ids 查找最新的商品数据", httpMethod = "GET")
+    @GetMapping("/refresh")
+    public JSONResult refresh(
+            @ApiParam(name = "itemSpecIds", value = "拼接的规格ids", required = true, example = "1001,1003,1005")
+            @RequestParam String itemSpecIds) {
+
+        if (StringUtils.isBlank(itemSpecIds)) {
+            return JSONResult.ok();
+        }
+
+        List<ShopcartVO> list = itemService.queryItemsBySpecIds(itemSpecIds);
+
+        return JSONResult.ok(list);
     }
 }

@@ -2,6 +2,7 @@ package cn.mrcode.foodiedev.mapper;
 
 import cn.mrcode.foodiedev.pojo.vo.ItemCommentVO;
 import cn.mrcode.foodiedev.pojo.vo.SearchItemsVO;
+import cn.mrcode.foodiedev.pojo.vo.ShopcartVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface ItemsMapperCustom {
     List<SearchItemsVO> searchItems(@Param("paramsMap") Map<String, Object> map);
 
     List<SearchItemsVO> searchItemsByThirdCat(@Param("paramsMap") Map<String, Object> map);
+
+    List<ShopcartVO> queryItemsBySpecIds(@Param("paramsList") List specIdsList);
 }
