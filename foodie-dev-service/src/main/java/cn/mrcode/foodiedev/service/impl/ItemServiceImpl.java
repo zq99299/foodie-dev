@@ -1,21 +1,24 @@
 package cn.mrcode.foodiedev.service.impl;
 
-import cn.mrcode.foodiedev.mapper.ItemsImgMapper;
-import cn.mrcode.foodiedev.mapper.ItemsMapper;
-import cn.mrcode.foodiedev.mapper.ItemsParamMapper;
-import cn.mrcode.foodiedev.mapper.ItemsSpecMapper;
-import cn.mrcode.foodiedev.pojo.Items;
-import cn.mrcode.foodiedev.pojo.ItemsImg;
-import cn.mrcode.foodiedev.pojo.ItemsParam;
-import cn.mrcode.foodiedev.pojo.ItemsSpec;
+import cn.mrcode.foodiedev.common.enums.CommentLevel;
+import cn.mrcode.foodiedev.common.util.DesensitizationUtil;
+import cn.mrcode.foodiedev.common.util.PagedGridResult;
+import cn.mrcode.foodiedev.mapper.*;
+import cn.mrcode.foodiedev.pojo.*;
+import cn.mrcode.foodiedev.pojo.vo.CommentLevelCountsVO;
+import cn.mrcode.foodiedev.pojo.vo.ItemCommentVO;
 import cn.mrcode.foodiedev.service.ItemService;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author mrcode
@@ -32,6 +35,11 @@ public class ItemServiceImpl implements ItemService {
     private ItemsSpecMapper itemsSpecMapper;
     @Autowired
     private ItemsParamMapper itemsParamMapper;
+    @Autowired
+    private ItemsCommentsMapper itemsCommentsMapper;
+    @Autowired
+    private ItemsMapperCustom itemsMapperCustom;
+
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
@@ -67,5 +75,78 @@ public class ItemServiceImpl implements ItemService {
         criteria.andEqualTo("itemId", itemId);
 
         return itemsParamMapper.selectOneByExample(itemsParamExp);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public CommentLevelCountsVO queryCommentCounts(String itemId) {
+        Integer goodCounts = getCommentCounts(itemId, CommentLevel.GOOD.type);
+        Integer normalCounts = getCommentCounts(itemId, CommentLevel.NORMAL.type);
+        Integer badCounts = getCommentCounts(itemId, CommentLevel.BAD.type);
+        Integer totalCounts = goodCounts + normalCounts + badCounts;
+
+        CommentLevelCountsVO countsVO = new CommentLevelCountsVO();
+        countsVO.setTotalCounts(totalCounts);
+        countsVO.setGoodCounts(goodCounts);
+        countsVO.setNormalCounts(normalCounts);
+        countsVO.setBadCounts(badCounts);
+
+        return countsVO;
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    Integer getCommentCounts(String itemId, Integer level) {
+        ItemsComments condition = new ItemsComments();
+        condition.setItemId(itemId);
+        if (level != null) {
+            condition.setCommentLevel(level);
+        }
+        return itemsCommentsMapper.selectCount(condition);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult queryPagedComments(String itemId,
+                                              Integer level,
+                                              Integer page,
+                                              Integer pageSize) {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("itemId", itemId);
+        map.put("level", level);
+
+        // mybatis-pagehelper
+
+        /**
+         * page: 第几页
+         * pageSize: 每页显示条数
+         */
+        PageHelper.startPage(page, pageSize);
+
+        List<ItemCommentVO> list = itemsMapperCustom.queryItemComments(map);
+        for (ItemCommentVO vo : list) {
+            // 将昵称进行脱敏处理
+            // test -> t**t
+            vo.setNickname(DesensitizationUtil.commonDisplay(vo.getNickname()));
+        }
+
+        return setterPagedGrid(list, page);
+    }
+
+    /**
+     * 通用的转成我们自己的 pageResult 方法
+     *
+     * @param list
+     * @param page
+     * @return
+     */
+    private PagedGridResult setterPagedGrid(List<?> list, Integer page) {
+        PageInfo<?> pageList = new PageInfo<>(list);
+        PagedGridResult grid = new PagedGridResult();
+        grid.setPage(page);
+        grid.setRows(list);
+        grid.setTotal(pageList.getPages());
+        grid.setRecords(pageList.getTotal());
+        return grid;
     }
 }
