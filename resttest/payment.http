@@ -1,0 +1,5 @@
+### 支付中心查询订单支付情况
+POST http://payment.t.mukewang.com/foodie-payment/payment/getPaymentCenterOrderInfo?merchantUserId=190815GTKCBSS7MW&merchantOrderId=210216HW7D4NGT2W
+Content-Type: application/json
+imoocUserId: imooc
+password: imooc

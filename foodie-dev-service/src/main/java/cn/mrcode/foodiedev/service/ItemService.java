@@ -83,10 +83,34 @@ public interface ItemService {
                                           Integer page, Integer pageSize);
 
     /**
-     * 根据规格ids查询最新的购物车中商品数据（用于刷新渲染购物车中的商品数据）
+     * 根据规格 ids 查询最新的购物车中商品数据（用于刷新渲染购物车中的商品数据）
      *
      * @param specIds
      * @return
      */
     List<ShopcartVO> queryItemsBySpecIds(String specIds);
+
+    /**
+     * 根据商品规格 id 获取规格对象的具体信息
+     *
+     * @param specId
+     * @return
+     */
+    ItemsSpec queryItemSpecById(String specId);
+
+    /**
+     * 根据商品 id 获得商品图片主图 url
+     *
+     * @param itemId
+     * @return
+     */
+    String queryItemMainImgById(String itemId);
+
+    /**
+     * 减少库存
+     *
+     * @param specId
+     * @param buyCounts
+     */
+    void decreaseItemSpecStock(String specId, int buyCounts);
 }

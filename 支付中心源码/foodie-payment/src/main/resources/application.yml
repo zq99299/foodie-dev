@@ -1,0 +1,76 @@
+############################################################
+#
+# web访问端口号  约定：8089
+#
+############################################################
+server:
+  port: 8089
+  tomcat:
+    uri-encoding: UTF-8
+
+############################################################
+#
+# 配置数据源信息
+#
+############################################################
+spring:
+  profiles:
+    active: prod
+#  datasource:                                             ## 数据源的相关配置
+#    type: com.zaxxer.hikari.HikariDataSource              # 数据源 HikariCP
+#    driver-class-name: com.mysql.jdbc.Driver              # mysql驱动
+#    url: jdbc:mysql://localhost:3306/itzixi-pay?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+#    username: root
+#    password: root               # 本地数据库
+    hikari:
+      connection-timeout: 30000       # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 默认:30秒
+      minimum-idle: 5                 # 最小连接数
+      #      <!-- 连接池中允许的最大连接数。缺省值：10；推荐的公式：((core_count * 2) + effective_spindle_count) -->
+      # 如何计算 https://blog.csdn.net/X5fnncxzq4/article/details/80649679
+      maximum-pool-size: 20           # 最大连接数
+      auto-commit: true               # 自动提交
+      idle-timeout: 600000            # 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），默认:10分钟
+      pool-name: DatebookHikariCP     # 连接池名字
+      max-lifetime: 28740000          # 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms，建议设置比数据库超时时长少60秒，参考MySQL wait_timeout参数（show variables like '%timeout%';） -->
+      connection-test-query: SELECT 1
+  thymeleaf:
+    mode: HTML
+    encoding: utf-8
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+  #  redis:                    ## Redis 相关配置
+#    database: 1             # Redis数据库索引（默认为0）
+#    host: 192.168.1.64     # 本地 Redis服务器地址
+#    port: 6379              # 本地 Redis服务器连接端口
+#    password: imooc
+
+
+############################################################
+#
+# mybatis 配置
+#
+############################################################
+mybatis:
+  #config-location: classpath:mybatis/mybatis.cfg.xml        # mybatis配置文件所在路径
+  type-aliases-package: com.imooc.pojo                     # 所有POJO类所在包路径
+  mapper-locations: classpath:mapper/*.xml                  # mapper映射文件
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+############################################################
+#
+# mybatis mapper 配置
+#
+############################################################
+# 通用 Mapper 配置
+mapper:
+  mappers: com.imooc.my.mapper.MyMapper
+  not-empty: false
+  identity: MYSQL
+# 分页插件配置
+pagehelper:
+  helperDialect: mysql
+  supportMethodsArguments: true
+params: count=countSql

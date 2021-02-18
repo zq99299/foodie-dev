@@ -1,0 +1,17 @@
+spring:
+  datasource:                                             ## 数据源的相关配置
+    type: com.zaxxer.hikari.HikariDataSource              # 数据源 HikariCP
+    driver-class-name: com.mysql.jdbc.Driver              # mysql驱动
+    url: jdbc:mysql://localhost:3306/itzixi-pay?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: root
+  redis:
+    database: 0
+    host: 192.168.1.64
+    port: 6379
+#    password: imooc
+
+# 开发环境 mybatis 打印日志
+mybatis:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

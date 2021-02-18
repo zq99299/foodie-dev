@@ -1,0 +1,13 @@
+spring:
+  datasource:                                             ## 数据源的相关配置
+    type: com.zaxxer.hikari.HikariDataSource              # 数据源 HikariCP
+    driver-class-name: com.mysql.jdbc.Driver              # mysql驱动
+    url: jdbc:mysql://localhost:6022/itzixi-pay?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    username:
+    password:
+  redis:
+    database: 0
+    host:
+    port:
+    password:
+
