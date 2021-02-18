@@ -2,6 +2,7 @@
 /build/
 */target/
 /logs/
+/tempresource/
 
 ### STS ###
 .apt_generated
