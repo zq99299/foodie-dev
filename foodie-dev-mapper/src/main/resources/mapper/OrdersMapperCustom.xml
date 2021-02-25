@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.mrcode.foodiedev.mapper.OrdersMapperCustom" >
+
+  <resultMap id="myOrdersVO" type="cn.mrcode.foodiedev.pojo.vo.MyOrdersVO">
+    <id column="orderId" property="orderId"/>
+    <result column="createdTime" property="createdTime"/>
+    <result column="payMethod" property="payMethod"/>
+    <result column="realPayAmount" property="realPayAmount"/>
+      <result column="postAmount" property="postAmount"/>
+      <result column="orderStatus" property="orderStatus"/>
+      <result column="isComment" property="isComment"/>
+
+    <collection property="subOrderItemList"
+                select="getSubItems"
+                column="orderId"
+                ofType="cn.mrcode.foodiedev.pojo.vo.MySubOrderItemVO">
+      <result column="itemId" property="itemId"/>
+      <result column="itemName" property="itemName"/>
+      <result column="itemImg" property="itemImg"/>
+        <result column="itemSpecId" property="itemSpecId"/>
+        <result column="itemSpecName" property="itemSpecName"/>
+        <result column="buyCounts" property="buyCounts"/>
+        <result column="price" property="price"/>
+    </collection>
+  </resultMap>
+
+  <select id="queryMyOrders" resultMap="myOrdersVO" parameterType="Map">
+    SELECT
+        od.id as orderId,
+        od.created_time as createdTime,
+        od.pay_method as payMethod,
+        od.real_pay_amount as realPayAmount,
+        od.post_amount as postAmount,
+        os.order_status as orderStatus,
+        od.is_comment as isComment
+    FROM
+        orders od
+    LEFT JOIN
+        order_status os
+    on od.id = os.order_id
+    WHERE
+        od.user_id = #{paramsMap.userId}
+    AND
+        od.is_delete = 0
+        <if test="paramsMap.orderStatus != null">
+          and os.order_status = #{paramsMap.orderStatus}
+        </if>
+    ORDER BY
+        od.updated_time ASC
+  </select>
+    
+    
+    <select id="getSubItems" parameterType="String" resultType="cn.mrcode.foodiedev.pojo.vo.MySubOrderItemVO">
+
+      select
+        oi.item_id as itemId,
+        oi.item_name as itemName,
+        oi.item_img as itemImg,
+        oi.item_spec_name as itemSpecName,
+        oi.buy_counts as buyCounts,
+        oi.price as price
+      from
+        order_items oi
+      where
+        oi.order_id = #{orderId}
+
+    </select>
+    
+
+    <select id="queryMyOrdersDoNotUse" resultMap="myOrdersVO" parameterType="Map">
+        SELECT
+        od.id as orderId,
+        od.created_time as createdTime,
+        od.pay_method as payMethod,
+        od.real_pay_amount as realPayAmount,
+        od.post_amount as postAmount,
+        os.order_status as orderStatus,
+        oi.item_id as itemId,
+        oi.item_name as itemName,
+        oi.item_img as itemImg,
+        oi.item_spec_name as itemSpecName,
+        oi.buy_counts as buyCounts,
+        oi.price as price
+        FROM
+        orders od
+        LEFT JOIN
+        order_status os
+        on od.id = os.order_id
+        LEFT JOIN
+        order_items oi
+        ON od.id = oi.order_id
+        WHERE
+        od.user_id = #{paramsMap.userId}
+        AND
+        od.is_delete = 0
+        <if test="paramsMap.orderStatus != null">
+            and os.order_status = #{paramsMap.orderStatus}
+        </if>
+        ORDER BY
+        od.updated_time ASC
+    </select>
+
+
+    <select id="getMyOrderStatusCounts" parameterType="Map" resultType="int">
+        SELECT
+            count(1)
+        FROM
+            orders o
+        LEFT JOIN
+            order_status os
+        on
+            o.id = os.order_id
+        WHERE
+            o.user_id = #{paramsMap.userId}
+        AND
+            os.order_status = #{paramsMap.orderStatus}
+        <if test="paramsMap.isComment != null">
+            and o.is_comment = #{paramsMap.isComment}
+        </if>
+    </select>
+
+
+    <select id="getMyOrderTrend" parameterType="Map" resultType="cn.mrcode.foodiedev.pojo.OrderStatus">
+
+        SELECT
+            os.order_id as orderId,
+            os.order_status as orderStatus,
+            os.created_time as createdTime,
+            os.pay_time as payTime,
+            os.deliver_time as deliverTime,
+            os.success_time as successTime,
+            os.close_time as closeTime,
+            os.comment_time as commentTime
+        FROM
+          orders o
+        LEFT JOIN
+          order_status os
+        on
+          o.id = os.order_id
+        WHERE
+          o.is_delete = 0
+        AND
+          o.user_id = #{paramsMap.userId}
+        AND
+          os.order_status in (20, 30, 40)
+        ORDER BY
+          os.order_id
+        DESC
+    </select>
+</mapper>
