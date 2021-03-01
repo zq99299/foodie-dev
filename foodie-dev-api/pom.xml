@@ -10,6 +10,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>foodie-dev-api</artifactId>
+<!--    <packaging>jar</packaging>-->
+    <!-- 打包 war 1：由 jar 包改成 war 包 -->
+    <packaging>war</packaging>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
