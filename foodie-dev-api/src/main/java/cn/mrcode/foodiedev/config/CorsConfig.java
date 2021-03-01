@@ -19,6 +19,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         // 设置运行跨域的地址，也可以使用 * 代替允许所有地址
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://192.168.56.105:8080");
         // 是否运行携带 cookie 相关信息
         // 在前端也有的框架可以配置这一样，前端是否允许跨域的时候携带：axios.defaults.withCredentials = true;
         config.setAllowCredentials(true);
