@@ -2,6 +2,7 @@ package cn.mrcode.foodiedev.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -164,6 +165,8 @@ public final class CookieUtils {
 
 
     /**
+     * 由于 cookie 工具类不支持 SameSite 属性的设置，这里就只能使用 设置 header 的方式来设置 cookie
+     *
      * @param request
      * @param response
      * @param cookieName
@@ -172,6 +175,26 @@ public final class CookieUtils {
      * @param isEncode
      * @Description: 设置 Cookie 的值，并使其在指定时间内生效
      */
+//    private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
+//                                          String cookieName, String cookieValue, int cookieMaxage, boolean isEncode) {
+//        try {
+//            if (cookieValue == null) {
+//                cookieValue = "";
+//            } else if (isEncode) {
+//                cookieValue = URLEncoder.encode(cookieValue, "utf-8");
+//            }
+//            ResponseCookie.ResponseCookieBuilder rr = ResponseCookie.from(cookieName, cookieValue)
+//                    .domain("")
+//                    .maxAge(cookieMaxage)
+//                    .path("/")
+//                    .httpOnly(false)
+//                    .secure(false) // 是否允许 js 读取，这里貌似要设置成 true
+//                    .sameSite("None");
+//            response.addHeader("Set-Cookie", rr.build().toString());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
                                           String cookieName, String cookieValue, int cookieMaxage, boolean isEncode) {
         try {
@@ -181,6 +204,7 @@ public final class CookieUtils {
                 cookieValue = URLEncoder.encode(cookieValue, "utf-8");
             }
             Cookie cookie = new Cookie(cookieName, cookieValue);
+
             if (cookieMaxage > 0)
                 cookie.setMaxAge(cookieMaxage);
             if (null != request) {// 设置域名的cookie
