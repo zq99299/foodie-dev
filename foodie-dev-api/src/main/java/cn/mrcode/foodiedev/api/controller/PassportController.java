@@ -108,6 +108,7 @@ public class PassportController {
 
         // 设置 cookie
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+        System.out.println("设置 COOKIE" + JsonUtils.objectToJson(user));
 
         return JSONResult.ok(user);
     }

@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ### 登录
-POST http://api.shop.cn:8080/foodie-dev-api/passport/login
+POST http://api.shop.cn/foodie-dev-api/passport/login
 Content-Type: application/json
 
 {
