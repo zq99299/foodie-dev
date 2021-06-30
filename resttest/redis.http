@@ -1,0 +1,8 @@
+### set
+GET http://localhost:8080/redis/set?key=name&value=mrcode
+
+### get
+GET http://localhost:8080/redis/get?key=name
+
+### delete
+GET http://localhost:8080/redis/delete?key=name

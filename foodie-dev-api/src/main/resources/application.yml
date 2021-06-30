@@ -17,7 +17,7 @@ server:
 ############################################################
 spring:
   profiles:
-    active: prod
+    active: dev
   datasource:
     type: com.zaxxer.hikari.HikariDataSource                # 数据源类型：HikariCP
     driver-class-name: com.mysql.cj.jdbc.Driver             # 数据源的相关配置

@@ -73,10 +73,10 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <exclusions>
                 <!-- 打包 war 2：移除内置的 tomcat -->
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-tomcat</artifactId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>org.springframework.boot</groupId>-->
+<!--                    <artifactId>spring-boot-starter-tomcat</artifactId>-->
+<!--                </exclusion>-->
             </exclusions>
         </dependency>
         <!-- 配置文件解析，boot 默认对 yml 支持，其他格式的需要引入该依赖-->
@@ -163,10 +163,16 @@
         </dependency>
 
         <!-- 打包 war 3：添加依赖 -->
+<!--        <dependency>-->
+<!--            <groupId>javax.servlet</groupId>-->
+<!--            <artifactId>javax.servlet-api</artifactId>-->
+<!--            <scope>provided</scope>-->
+<!--        </dependency>-->
+
+        <!-- 引入 redis 依赖  -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
     </dependencies>
 

@@ -6,6 +6,11 @@ spring:
     url: jdbc:mysql://localhost:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
     username: root
     password: root
+  redis:
+    database: 1
+    host: 192.168.56.105
+    port: 6379
+    password: 123456
 
 mybatis:
   configuration:
