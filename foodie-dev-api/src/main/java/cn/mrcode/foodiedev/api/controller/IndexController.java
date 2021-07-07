@@ -78,10 +78,10 @@ public class IndexController {
             @ApiParam(name = "rootCatId", value = "一级分类 ID", required = true)
             @PathVariable Integer rootCatId) {
         List<CategoryVO> list = null;
-        String subCatStr = redisOperator.get("subCat");
+        String subCatStr = redisOperator.get("subCat:" + rootCatId);
         if (StringUtils.isBlank(subCatStr)) {
             list = categoryService.getSubCatList(rootCatId);
-            redisOperator.set("subCat", JsonUtils.objectToJson(list));
+            redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
         } else {
             list = JsonUtils.jsonToList(subCatStr, CategoryVO.class);
         }
