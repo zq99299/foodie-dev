@@ -14,6 +14,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Api(value = "购物接口", tags = {"购物车接口相关的 api"})
@@ -83,7 +84,25 @@ public class ShopcatController extends BaseController {
             return JSONResult.errorMsg("参数不能为空");
         }
 
-        // TODO 用户在页面删除购物车中的商品数据，如果此时用户已经登录，则需要同步删除后端购物车中的商品
+        // 用户在页面删除购物车中的商品数据，如果此时用户已经登录，则需要同步删除后端购物车中的商品
+        String key = BaseController.FOODIE_SHOPCART + ":" + userId;
+        String shopcartJson = redisOperator.get(key);
+        List<ShopcartBO> shopcartBOList = null;
+        // redis 中已经有购物车
+        if (StringUtils.isNotBlank(shopcartJson)) {
+            shopcartBOList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
+            Iterator<ShopcartBO> iterator = shopcartBOList.iterator();
+            while (iterator.hasNext()) {
+                ShopcartBO sc = iterator.next();
+                String specId = sc.getSpecId();
+                // 如果能对上，则删除该商品
+                if (specId.equals(itemSpecId)) {
+                    iterator.remove();
+                }
+            }
+            // 覆盖 redis 中的数据
+            redisOperator.set(key, JsonUtils.objectToJson(shopcartBOList));
+        }
 
         return JSONResult.ok();
     }

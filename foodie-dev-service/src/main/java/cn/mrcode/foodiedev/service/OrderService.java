@@ -1,8 +1,11 @@
 package cn.mrcode.foodiedev.service;
 
 import cn.mrcode.foodiedev.pojo.OrderStatus;
+import cn.mrcode.foodiedev.pojo.bo.ShopcartBO;
 import cn.mrcode.foodiedev.pojo.bo.SubmitOrderBO;
 import cn.mrcode.foodiedev.pojo.vo.OrderVO;
+
+import java.util.List;
 
 /**
  * @author mrcode
@@ -12,9 +15,10 @@ public interface OrderService {
     /**
      * 用于创建订单相关信息
      *
+     * @param shopcartBOList
      * @param submitOrderBO
      */
-    OrderVO createOrder(SubmitOrderBO submitOrderBO);
+    OrderVO createOrder(List<ShopcartBO> shopcartBOList, SubmitOrderBO submitOrderBO);
 
     /**
      * 修改订单状态

@@ -4,13 +4,17 @@ import cn.mrcode.foodiedev.common.enums.OrderStatusEnum;
 import cn.mrcode.foodiedev.common.enums.PayMethod;
 import cn.mrcode.foodiedev.common.util.CookieUtils;
 import cn.mrcode.foodiedev.common.util.JSONResult;
+import cn.mrcode.foodiedev.common.util.JsonUtils;
+import cn.mrcode.foodiedev.common.util.RedisOperator;
 import cn.mrcode.foodiedev.pojo.OrderStatus;
+import cn.mrcode.foodiedev.pojo.bo.ShopcartBO;
 import cn.mrcode.foodiedev.pojo.bo.SubmitOrderBO;
 import cn.mrcode.foodiedev.pojo.vo.MerchantOrdersVO;
 import cn.mrcode.foodiedev.pojo.vo.OrderVO;
 import cn.mrcode.foodiedev.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +25,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Api(value = "订单相关", tags = {"订单相关 API 接口"})
 @RestController
@@ -31,6 +36,8 @@ public class OrdersController extends BaseController {
     private OrderService orderService;
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private RedisOperator redisOperator;
 
     @ApiOperation(value = "用户下单", notes = "用户下单", httpMethod = "POST")
     @PostMapping("/create")
@@ -46,8 +53,15 @@ public class OrdersController extends BaseController {
 
 //        System.out.println(submitOrderBO.toString());
 
-        // 1. 创建订单
-        OrderVO orderVO = orderService.createOrder(submitOrderBO);
+        String key = BaseController.FOODIE_SHOPCART + ":" + submitOrderBO.getUserId();
+        String shopcartJson = redisOperator.get(key);
+        if (StringUtils.isBlank(shopcartJson)) {
+            return JSONResult.errorMsg("购物车数据不正确");
+        }
+        List<ShopcartBO> shopcartBOList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);
+
+        // 1. 创建订单: 将购物车也传递进去
+        OrderVO orderVO = orderService.createOrder(shopcartBOList, submitOrderBO);
         String orderId = orderVO.getOrderId();
 
         // 2. 创建订单以后，移除购物车中已结算（已提交）的商品
@@ -57,9 +71,14 @@ public class OrdersController extends BaseController {
          * 3003 -> 用户购买
          * 4004
          */
-        // TODO 整合redis之后，完善购物车中的已结算商品清除，并且同步到前端的cookie
+        // 整合redis之后，完善购物车中的已结算商品清除，并且同步到前端的cookie
         // 这里直接清空购物车，后续讲  redis 之后，再来完善移除已购产品的操作
-        CookieUtils.setCookie(request, response, FOODIE_SHOPCART, "", true);
+        // 从现有的购物数据中删除已经购买的
+        shopcartBOList.removeAll(orderVO.getToBeRemovedShopcatdList());
+        // 更新已经删除了购买商品的购物车
+        redisOperator.set(key, JsonUtils.objectToJson(shopcartBOList));
+        // 更新 cookie 的购物数据
+        CookieUtils.setCookie(request, response, FOODIE_SHOPCART, JsonUtils.objectToJson(shopcartBOList), true);
 
         // 3. 向支付中心发送当前订单，用于保存支付中心的订单数据
         MerchantOrdersVO merchantOrdersVO = orderVO.getMerchantOrdersVO();

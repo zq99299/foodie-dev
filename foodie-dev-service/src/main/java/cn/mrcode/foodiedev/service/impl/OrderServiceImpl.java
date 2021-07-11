@@ -3,22 +3,26 @@ package cn.mrcode.foodiedev.service.impl;
 import cn.mrcode.foodiedev.common.enums.OrderStatusEnum;
 import cn.mrcode.foodiedev.common.enums.YesOrNo;
 import cn.mrcode.foodiedev.common.util.DateUtil;
+import cn.mrcode.foodiedev.common.util.RedisOperator;
 import cn.mrcode.foodiedev.mapper.OrderItemsMapper;
 import cn.mrcode.foodiedev.mapper.OrderStatusMapper;
 import cn.mrcode.foodiedev.mapper.OrdersMapper;
 import cn.mrcode.foodiedev.pojo.*;
+import cn.mrcode.foodiedev.pojo.bo.ShopcartBO;
 import cn.mrcode.foodiedev.pojo.bo.SubmitOrderBO;
 import cn.mrcode.foodiedev.pojo.vo.MerchantOrdersVO;
 import cn.mrcode.foodiedev.pojo.vo.OrderVO;
 import cn.mrcode.foodiedev.service.AddressService;
 import cn.mrcode.foodiedev.service.ItemService;
 import cn.mrcode.foodiedev.service.OrderService;
+import org.apache.commons.lang3.StringUtils;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,11 +46,12 @@ public class OrderServiceImpl implements OrderService {
     private OrderItemsMapper orderItemsMapper;
     @Autowired
     private OrderStatusMapper orderStatusMapper;
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
-
+    public OrderVO createOrder(List<ShopcartBO> shopcartBOList, SubmitOrderBO submitOrderBO) {
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
         String itemSpecIds = submitOrderBO.getItemSpecIds();
@@ -93,10 +98,20 @@ public class OrderServiceImpl implements OrderService {
         String itemSpecIdArr[] = itemSpecIds.split(",");
         Integer totalAmount = 0;    // 商品原价累计
         Integer realPayAmount = 0;  // 优惠后的实际支付价格累计
+
+        // 需要从购物车中清理的商品信息，该信息需要在 controller 中做
+        List<ShopcartBO> toBeRemovedShopcatdList = new ArrayList<>();
         for (String itemSpecId : itemSpecIdArr) {
 
-            // TODO 整合 redis 后，商品购买的数量重新从 redis 的购物车中获取
-            int buyCounts = 1;
+            // 整合 redis 后，商品购买的数量重新从 redis 的购物车中获取
+            /*
+              1. 从购物车中拿到对应的商品数量
+              2. 将购买过的商品从购物车中删除
+             */
+            ShopcartBO shopcartBO = getBuyCountsFromShopcart(shopcartBOList, itemSpecId);
+            // 添加到待清理的商品容器中
+            toBeRemovedShopcatdList.add(shopcartBO);
+            int buyCounts = shopcartBO.getBuyCounts();
 
             // 2.1 根据规格 id，查询规格的具体信息，主要获取价格
             ItemsSpec itemSpec = itemService.queryItemSpecById(itemSpecId);
@@ -148,10 +163,25 @@ public class OrderServiceImpl implements OrderService {
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
         orderVO.setMerchantOrdersVO(merchantOrdersVO);
-
+        orderVO.setToBeRemovedShopcatdList(toBeRemovedShopcatdList);
         return orderVO;
     }
 
+    /**
+     * 从购物车中找到对应的商品
+     *
+     * @param shopcartList
+     * @param specId
+     * @return
+     */
+    private ShopcartBO getBuyCountsFromShopcart(List<ShopcartBO> shopcartList, String specId) {
+        for (ShopcartBO cart : shopcartList) {
+            if (cart.getSpecId().equals(specId)) {
+                return cart;
+            }
+        }
+        return null;
+    }
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
