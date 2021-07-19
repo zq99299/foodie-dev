@@ -7,10 +7,21 @@ spring:
     username: root
     password: root
   redis:
+    # 单机但实例
+#    database: 1
+#    host: 192.168.56.105
+#    port: 6379
+#    password: 123456
+    # 哨兵模式
     database: 1
-    host: 192.168.56.105
-    port: 6379
     password: 123456
+    sentinel:
+      # 哨兵集群的 master 名称
+      master: mrcode-master
+      # 哨兵集群的所有节点，注意这里的端口：给的是哨兵的端口
+      # 相当于外部访问要通过哨兵来访问，redis 已经托管给哨兵了
+      # 这样框架就会解决：当 master 变更之后，程序不用做变更，就能正确的找到新的 master 写入
+      nodes: 192.168.56.105:26379,192.168.56.106:26379,192.168.56.107:26379
 
 mybatis:
   configuration:
