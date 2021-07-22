@@ -6,3 +6,12 @@ GET http://localhost:8088/redis/get?key=name
 
 ### delete
 GET http://localhost:8088/redis/delete?key=name
+
+### set
+GET http://localhost:8088/redis/set?key=age&value=189
+
+### get
+GET http://localhost:8088/redis/get?key=age
+
+### delete
+GET http://localhost:8088/redis/delete?key=age
