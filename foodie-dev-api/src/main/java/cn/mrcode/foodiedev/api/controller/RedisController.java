@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.annotations.ApiIgnore;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author mrcode
  * @date 2021/6/30 22:39
@@ -41,5 +45,11 @@ public class RedisController {
         // redisTemplate.delete(key);
         redisOperator.del(key);
         return "OK";
+    }
+
+    @GetMapping("/getALot")
+    public Object getALot(String... keys) {
+        List<Object> result = redisOperator.batchGet(Arrays.asList(keys));
+        return result;
     }
 }
