@@ -81,7 +81,12 @@ public class IndexController {
         String subCatStr = redisOperator.get("subCat:" + rootCatId);
         if (StringUtils.isBlank(subCatStr)) {
             list = categoryService.getSubCatList(rootCatId);
-            redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
+            if (list != null && list.size() > 0) {
+                // 为空的时候，设置缓存时间为 5 分钟
+                redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list), 60 * 5);
+            } else {
+                redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
+            }
         } else {
             list = JsonUtils.jsonToList(subCatStr, CategoryVO.class);
         }
