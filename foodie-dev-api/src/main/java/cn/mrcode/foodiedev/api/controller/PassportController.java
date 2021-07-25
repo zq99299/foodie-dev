@@ -4,6 +4,7 @@ import cn.mrcode.foodiedev.common.util.*;
 import cn.mrcode.foodiedev.pojo.Users;
 import cn.mrcode.foodiedev.pojo.bo.ShopcartBO;
 import cn.mrcode.foodiedev.pojo.bo.UserBO;
+import cn.mrcode.foodiedev.pojo.vo.UsersVO;
 import cn.mrcode.foodiedev.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -11,9 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +22,7 @@ import java.util.List;
 @Api(value = "注册登录", tags = {"用户注册登录的相关接口"}) // API 分组
 @RestController
 @RequestMapping("/passport")
-public class PassportController {
+public class PassportController extends BaseController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -80,10 +79,14 @@ public class PassportController {
         Users user = userService.createUser(userBO);
 
         // 脱敏信息
-        setNullProperty(user);
+        // setNullProperty(user);
+        // 下面使用 userVo 之后，这个 脱敏信息的就不再需要了
 
-        // 设置 cookie
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+        UsersVO usersVO = convertVo(user);
+
+        // 设置 cookie,使用 userVO 返回
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(usersVO), true);
 
         // 同步购物车数据
         synchShopcartData(user.getId(), request, response);
@@ -109,10 +112,11 @@ public class PassportController {
         }
 
         // 脱敏信息
-        setNullProperty(user);
+        // setNullProperty(user);
+        UsersVO usersVO = convertVo(user);
 
         // 设置 cookie
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(user), true);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
 
         // 生成用户 token 存入 redis 会话
         // 同步购物车数据
@@ -206,6 +210,8 @@ public class PassportController {
         // 但是需要清空 cookie 里面的信息
         CookieUtils.deleteCookie(request, response, "user");
 
+        // 用户退出，清理 redis 中的用户会话信息
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
         // 清理 cookie 中的购物车，但是 redis 中不要清理，相当于购物车数据已经保存在服务端了
         CookieUtils.deleteCookie(request, response, BaseController.FOODIE_SHOPCART);
         return JSONResult.ok();

@@ -1,12 +1,10 @@
 package cn.mrcode.foodiedev.api.controller.center;
 
 import cn.mrcode.foodiedev.api.controller.BaseController;
-import cn.mrcode.foodiedev.common.util.CookieUtils;
-import cn.mrcode.foodiedev.common.util.DateUtil;
-import cn.mrcode.foodiedev.common.util.JSONResult;
-import cn.mrcode.foodiedev.common.util.JsonUtils;
+import cn.mrcode.foodiedev.common.util.*;
 import cn.mrcode.foodiedev.pojo.Users;
 import cn.mrcode.foodiedev.pojo.bo.center.CenterUserBO;
+import cn.mrcode.foodiedev.pojo.vo.UsersVO;
 import cn.mrcode.foodiedev.resource.FileUpload;
 import cn.mrcode.foodiedev.service.center.CenterUserService;
 import io.swagger.annotations.Api;
@@ -14,6 +12,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -30,6 +29,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author mrcode
@@ -45,6 +45,8 @@ public class CenterUserController extends BaseController {
     @Autowired
     private FileUpload fileUpload;
 
+    @Autowired
+    private RedisOperator redisOperator;
 
     @ApiOperation(value = "修改用户信息", notes = "修改用户信息", httpMethod = "POST")
     @PostMapping("update")
@@ -65,12 +67,12 @@ public class CenterUserController extends BaseController {
 
         Users userResult = centerUserService.updateUserInfo(userId, centerUserBO);
 
-        // 脱敏之后，写会 cookie 中，更新前端页面中各处显示的信息，比如昵称在右上角显示的
-        userResult = setNullProperty(userResult);
-        CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(userResult), true);
+        // 转换，并重新生成 token 放入 redis 中
+        UsersVO usersVO = convertVo(userResult);
 
-        // TODO 后续要改，增加令牌 token，会整合进 redis，分布式会话
+        // userResult = setNullProperty(userResult);
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(usersVO), true);
 
         return JSONResult.ok();
     }
@@ -161,11 +163,12 @@ public class CenterUserController extends BaseController {
         // 更新用户头像到数据库
         Users userResult = centerUserService.updateUserFace(userId, finalUserFaceUrl);
 
-        userResult = setNullProperty(userResult);
-        CookieUtils.setCookie(request, response, "user",
-                JsonUtils.objectToJson(userResult), true);
+        //userResult = setNullProperty(userResult);
 
-        // TODO 后续要改，增加令牌token，会整合进redis，分布式会话
+        // 转换，并重新生成 token 放入 redis 中
+        UsersVO usersVO = convertVo(userResult);
+        CookieUtils.setCookie(request, response, "user",
+                JsonUtils.objectToJson(usersVO), true);
 
         return JSONResult.ok();
     }
