@@ -1,0 +1,2 @@
+### set
+GET http://localhost:8088/hello/setSession
