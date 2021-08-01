@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<body>
+<div id="mtv">
+    <h1>MTV 系统</h1>
+    <div v-if="userIsLogin != true">
+        欢迎陌生人，请 <a>登录</a>
+    </div>
+    <div v-if="userIsLogin == true">
+        欢迎 <span style="color: #0ac265">{{userInfo.username}}</span>
+        <br/>
+        <button @click="logout">点击退出登录</button>
+    </div>
+</div>
+
+</body>
+<script src="./app.js"></script>
+<script>
+    var index = new Vue({
+        el: "#mtv",
+        data: {
+            userIsLogin: false,
+            userInfo: {}
+        },
+        created() {
+            var me = this;
+            this.judgeUserLoginStatus();
+            var userIsLogin = this.userIsLogin;
+            // 如果没有登录
+            if (!userIsLogin) {
+                var tmpTicket = app.getUrlParam('tmpTicket');
+                console.log('tmpTicket:' + tmpTicket);
+                if (tmpTicket != null && tmpTicket != "" && tmpTicket != undefined) {
+                    // 如果有临时票据，则携带临时票据发起请求到 cas 验证获取用户会话
+                    axios.defaults.withCredentials = true; // 允许携带 cookie
+                    axios.post('http://www.sso.com:8090/verifyTmpTicket?tmpTicket=' + tmpTicket)
+                        .then(res => {
+                            if (res.dat.status == 200) {
+                                var userInfo = res.data.data;
+                                console.log(userInfo);
+                                this.userInfo = userInfo;
+                                this.userIsLogin = true;
+                                app.setCookie("user", JSON.stringify(userInfo))
+                                window.location.href = "http://www.mtv.com:8080/sso-mtv/index.html";
+                            } else {
+                                alert(res.data.msg)
+                                console.log(res.data.msg)
+                            }
+                        });
+                } else {
+                    // 如果没有临时票据，说明该用户没有登录过，就直接跳转到  cas 统一登录认证
+                    window.location.href = app.SSOServerUrl + "/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html";
+                }
+            }
+        },
+        methods: {
+            // 通过cookie判断用户是否登录
+            judgeUserLoginStatus() {
+                var userCookie = app.getCookie("user");
+                if (
+                    userCookie != null &&
+                    userCookie != undefined &&
+                    userCookie != ""
+                ) {
+                    var userInfoStr = decodeURIComponent(userCookie);
+                    // console.log(userInfo);
+                    if (
+                        userInfoStr != null &&
+                        userInfoStr != undefined &&
+                        userInfoStr != ""
+                    ) {
+                        var userInfo = JSON.parse(userInfoStr);
+                        // 判断是否是一个对象
+                        if (typeof (userInfo) == "object") {
+                            this.userIsLogin = true;
+                            // console.log(userInfo);
+                            this.userInfo = userInfo;
+                        } else {
+                            this.userIsLogin = false;
+                            this.userInfo = {};
+                        }
+                    }
+                } else {
+                    this.userIsLogin = false;
+                    this.userInfo = {};
+                }
+            }
+        }
+    })
+</script>
+</html>

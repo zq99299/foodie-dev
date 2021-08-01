@@ -15,6 +15,7 @@
         <module>foodie-dev-mapper</module>
         <module>foodie-dev-service</module>
         <module>foodie-dev-api</module>
+        <module>foodie-sso</module>
     </modules>
 
 
