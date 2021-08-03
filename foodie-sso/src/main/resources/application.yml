@@ -9,6 +9,13 @@ server:
   tomcat:
     uri-encoding: utf-8
   max-http-header-size: 80KB
+  ssl:
+    enabled: true
+    key-store: classpath:tomcat_https.keystore
+    key-store-type: JKS
+    key-alias: tomcat_https
+    key-password: 123456
+    key-store-password: 123456
 
 ############################################################
 #

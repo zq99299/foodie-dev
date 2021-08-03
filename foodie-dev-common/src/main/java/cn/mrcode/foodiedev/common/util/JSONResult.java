@@ -70,6 +70,16 @@ public class JSONResult {
         return new JSONResult(556, msg, null);
     }
 
+    /**
+     * 错误的 oos 票据
+     *
+     * @param msg
+     * @return
+     */
+    public static JSONResult errorUserTicket(String msg) {
+        return new JSONResult(557, msg, null);
+    }
+
     public JSONResult() {
 
     }

@@ -1,5 +1,5 @@
 window.app = {
-    SSOServerUrl: "http://www.sso.com:8090",
+    SSOServerUrl: "https://www.sso.com:8090",
     cookieDomain: ".mtv.com;",
 
     getCookie: function (cname) {

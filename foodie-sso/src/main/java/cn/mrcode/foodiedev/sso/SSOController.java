@@ -7,10 +7,15 @@ import cn.mrcode.foodiedev.service.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -96,8 +101,51 @@ public class SSOController {
         // 5. 生成临时票据：用于回跳到调用端网站，是由 CAS 端所签发的一个一次性的临时 ticket
         String tmpTicket = createTmpTicket();
 
-        return "login";
-        // return "redirect:" + retrunUrl + "?tmpTicket=" + tmpTicket;
+        // return "login";
+        return "redirect:" + retrunUrl + "?tmpTicket=" + tmpTicket;
+    }
+
+    /**
+     * 验证临时票据，并返回用户信息和token
+     *
+     * @param tmpTicket
+     * @return
+     */
+    @PostMapping("verifyTmpTicket")
+    @ResponseBody
+    public JSONResult verifyTmpTicket(@RequestParam String tmpTicket, HttpServletRequest request) throws Exception {
+        // 验证临时票据
+        String key = REDIS_TMP_TICKET + ":" + tmpTicket;
+        String tmpTicketValue = redisOperator.get(key);
+        if (StringUtils.isBlank(tmpTicketValue)) {
+            return JSONResult.errorUserTicket("用户票据异常");
+        }
+
+        if (!tmpTicketValue.equals(MD5Utils.getMD5Str(tmpTicket))) {
+            return JSONResult.errorUserTicket("用户票据异常");
+        }
+
+        // 销毁临时票据
+        redisOperator.del(key);
+        /*
+         这里笔者说下：它的临时票据没有和全局票均关联上
+          全局票据：关联的是 用户 ID 信息
+          临时票据：没有任何关联
+          token：关联的是用户信息和  token，tokenKey 的组成是固定前缀+ 用户 ID
+         */
+
+        // 换取用户会话，从 cookie 中获取到全局票据，拿到用户 ID,然后拿到与 token 相关的用户信息
+        String userTicket = getCookie(COOKIE_USER_TICKET, request);
+        String userId = redisOperator.get(REDIS_USER_TICKET + ":" + userTicket);
+        if (userId == null) {
+            return JSONResult.errorUserTicket("用户全局票据异常");
+        }
+        String tokenValueJson = redisOperator.get(REDIS_USER_TOKEN + ":" + userId);
+        if (tokenValueJson == null) {
+            return JSONResult.errorUserTicket("用户 token 异常");
+        }
+        UsersVO usersVO = JsonUtils.jsonToPojo(tokenValueJson, UsersVO.class);
+        return JSONResult.ok(usersVO);
     }
 
     private UsersVO convertVo(Users user) {
@@ -130,9 +178,38 @@ public class SSOController {
     }
 
     private void setCookie(String key, String val, HttpServletResponse response) {
-        Cookie cookie = new Cookie(key, val);
-        cookie.setDomain("sso.com");
-        cookie.setPath("/");
-        response.addCookie(cookie);
+//        Cookie cookie = new Cookie(key, val);
+//        cookie.setDomain("sso.com");
+//        cookie.setPath("/");
+        ResponseCookie cookie = ResponseCookie.from(key, val) // key & value
+                .secure(true)        // 在 https 下传输,配合 none 使用
+                .httpOnly(false)
+                .domain("sso.com")// 域名
+                .path("/")            // path
+                .sameSite("None") // 大多数情况也是不发送第三方 Cookie，但是导航到目标网址的 Get 请求除外 Lax 或者 none
+                // .sameSite("Lax")
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    /**
+     * 从 request 中获取 cookie
+     *
+     * @param key
+     * @param request
+     * @return
+     */
+    private String getCookie(String key, HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || key == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            String name = cookie.getName();
+            if (key.equalsIgnoreCase(name)) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

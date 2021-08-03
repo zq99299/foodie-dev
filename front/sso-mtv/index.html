@@ -39,7 +39,7 @@
                 if (tmpTicket != null && tmpTicket != "" && tmpTicket != undefined) {
                     // 如果有临时票据，则携带临时票据发起请求到 cas 验证获取用户会话
                     axios.defaults.withCredentials = true; // 允许携带 cookie
-                    axios.post('http://www.sso.com:8090/verifyTmpTicket?tmpTicket=' + tmpTicket)
+                    axios.post('https://www.sso.com:8090/verifyTmpTicket?tmpTicket=' + tmpTicket)
                         .then(res => {
                             if (res.dat.status == 200) {
                                 var userInfo = res.data.data;
@@ -57,7 +57,7 @@
                     // console.log(`${app.SSOServerUrl}/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html`);
                     // 如果没有临时票据，说明该用户没有登录过，就直接跳转到  cas 统一登录认证
                     // alert('跳转到登录页')
-                    // window.location.href = app.SSOServerUrl + "/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html";
+                    window.location.href = app.SSOServerUrl + "/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html";
                 }
             }
         },
