@@ -1,6 +1,6 @@
 window.app = {
     SSOServerUrl: "https://www.sso.com:8090",
-    cookieDomain: ".mtv.com;",
+    cookieDomain: ".music.com;",
 
     getCookie: function (cname) {
         var name = cname + "=";

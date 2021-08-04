@@ -7,8 +7,8 @@
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.js"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <body>
-<div id="mtv">
-    <h1>MTV 系统</h1>
+<div id="music">
+    <h1>MUSIC 系统</h1>
     <div v-if="userIsLogin != true">
         欢迎陌生人，请 <a>登录</a>
     </div>
@@ -23,7 +23,7 @@
 <script src="./app.js"></script>
 <script>
     var index = new Vue({
-        el: "#mtv",
+        el: "#music",
         data: {
             userIsLogin: false,
             userInfo: {}
@@ -47,17 +47,16 @@
                                 this.userInfo = userInfo;
                                 this.userIsLogin = true;
                                 app.setCookie("user", JSON.stringify(userInfo))
-                                window.location.href = "http://www.mtv.com:8080/sso-mtv/index.html";
+                                window.location.href = "http://www.music.com:8080/sso-music/index.html";
                             } else {
                                 alert(res.data.msg)
                                 console.log(res.data.msg)
                             }
                         });
                 } else {
-                    // console.log(`${app.SSOServerUrl}/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html`);
                     // 如果没有临时票据，说明该用户没有登录过，就直接跳转到  cas 统一登录认证
                     // alert('跳转到登录页')
-                    window.location.href = app.SSOServerUrl + "/login?retrunUrl=http://www.mtv.com:8080/sso-mtv/index.html";
+                    window.location.href = app.SSOServerUrl + "/login?retrunUrl=http://www.music.com:8080/sso-music/index.html";
                 }
             }
         },
@@ -102,7 +101,7 @@
                             console.log(userInfo);
                             this.userInfo = {};
                             this.userIsLogin = false;
-                            app.deleteCookie("user", ".mtv.com")
+                            app.deleteCookie("user", ".music.com")
                             alert("退出成功")
                         } else {
                             alert(res.data.msg)

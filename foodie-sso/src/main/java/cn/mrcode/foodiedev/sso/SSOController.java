@@ -40,10 +40,46 @@ public class SSOController {
                         HttpServletResponse response) {
         // 将传递来的 url 放进 model 中，在 thymeleaf 页面中保存下来
         model.addAttribute("retrunUrl", retrunUrl);
-        // todo: 后续再来实现具体的逻辑
-        // 跳转到 login 页面
-        return "login";
+
+        // 1. 获取全局门票，如果从 cookie 中能 获取到，则表示该当前用户已经登录过，直接生成临时票据返回
+        String userTicket = getCookie(COOKIE_USER_TICKET, request);
+        if (!verifyUserTicket(userTicket)) {
+            // 没有登录过或则已经失效，则直接返回到登录页面，重新登录
+            return "login";
+        }
+        // 2. 生成临时票据：用于回跳到调用端网站，是由 CAS 端所签发的一个一次性的临时 ticket
+        String tmpTicket = createTmpTicket();
+
+        // 3. 直接回调会原系统
+        // return "login";
+        return "redirect:" + retrunUrl + "?tmpTicket=" + tmpTicket;
     }
+
+    /**
+     * 验证 全局门票是否有效
+     *
+     * @param userTicket
+     * @return
+     */
+    private boolean verifyUserTicket(String userTicket) {
+        // 没有全局门票，表示未登录过
+        if (StringUtils.isBlank(userTicket)) {
+            return false;
+        }
+        // 验证全局门票是否在 redis 中存在
+        String userId = redisOperator.get(REDIS_USER_TICKET + ":" + userTicket);
+        if (StringUtils.isBlank(userId)) {
+            return false;
+        }
+
+        // 验证该 userId 对应的会话是否存在
+        String userJson = redisOperator.get(REDIS_USER_TOKEN + ":" + userId);
+        if (StringUtils.isBlank(userId)) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * 用户登录：CAS 的统一登录接口
@@ -148,6 +184,35 @@ public class SSOController {
         return JSONResult.ok(usersVO);
     }
 
+    /**
+     * 账户注销、退出
+     *
+     * @param request
+     * @param response
+     * @return
+     */
+    @PostMapping("/logout")
+    @ResponseBody
+    public JSONResult login(HttpServletRequest request,
+                            HttpServletResponse response) {
+
+        String userTicket = getCookie(COOKIE_USER_TICKET, request);
+        if (StringUtils.isBlank(userTicket)) {
+            // 如果 cookie 中没有 ，则直接响应ok
+            return JSONResult.ok();
+        }
+        String userId = redisOperator.get(REDIS_USER_TICKET + ":" + userTicket);
+        if (StringUtils.isBlank(userId)) {
+            return JSONResult.ok();
+        }
+        // 删除 redis 中的 key
+        redisOperator.del(REDIS_USER_TICKET + ":" + userTicket);
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
+        // 删除全局门票的 cookie
+        delCookie(COOKIE_USER_TICKET, response);
+        return JSONResult.ok();
+    }
+
     private UsersVO convertVo(Users user) {
         // 实现用户的 redis 会话
         String uniqueToken = UUID.randomUUID().toString();
@@ -190,6 +255,20 @@ public class SSOController {
                 // .sameSite("Lax")
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+
+    /**
+     * 删除 cookie
+     *
+     * @param key
+     * @param response
+     */
+    private void delCookie(String key, HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, null);
+        cookie.setDomain("sso.com");
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);  // 过期时间为立即过期
+        response.addCookie(cookie);
     }
 
     /**
