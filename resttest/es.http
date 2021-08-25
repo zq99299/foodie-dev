@@ -1,0 +1,1064 @@
+### 创建索引
+PUT http://192.168.56.105:9200/my_temp_index
+Content-Type: application/json
+
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 0
+  }
+}
+
+### 查看索引
+GET http://192.168.56.105:9200/my_temp_index
+
+### 查看所有索引状态
+GET http://192.168.56.105:9200/_cat/indices?v
+
+### 创建索引 mapping
+PUT http://192.168.56.105:9200/index_mapping
+Content-Type: application/json
+
+{
+  "mappings": {
+    "properties": {
+      "realname": {
+        "type": "text",
+        "index": true
+      },
+      "username": {
+        "type": "keyword",
+        "index": false
+      }
+    }
+  }
+}
+
+### 获取 mapping 信息
+GET http://192.168.56.105:9200/index_mapping/_mapping
+
+### 测试 mapping 的字段分词
+GET http://192.168.56.105:9200/index_mapping/_analyze
+Content-Type: application/json
+
+{
+  "field": "username",
+  "text": "mrcode is very good~!"
+}
+
+### 增加字段映射
+PUT http://192.168.56.105:9200/index_mapping/_mapping
+Content-Type: application/json
+
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "age": {
+      "type": "integer"
+    }
+  }
+}
+
+### 增加字段映射
+PUT http://192.168.56.105:9200/index_mapping/_mapping
+Content-Type: application/json
+
+{
+  "properties": {
+    "money1": {
+      "type": "double"
+    },
+    "money2": {
+      "type": "float"
+    },
+    "sex": {
+      "type": "byte"
+    },
+    "score": {
+      "type": "short"
+    },
+    "is_teenger": {
+      "type": "boolean"
+    },
+    "birthday": {
+      "type": "date"
+    },
+    "relationship": {
+      "type": "object"
+    }
+  }
+}
+
+### 创建文档
+PUT http://192.168.56.105:9200/my_doc/_doc/1
+Content-Type: application/json
+
+{
+  "id": 1001,
+  "name": "mrcode-1",
+  "desc": "mrcode is very good，凉茶非常牛！",
+  "create_date": "2021-08-11"
+}
+
+### 获取 动态 mapping 信息
+GET http://192.168.56.105:9200/my_doc/_mapping
+
+
+### 增加测试数据
+PUT http://192.168.56.105:9200/my_doc/_doc/2
+Content-Type: application/json
+
+{
+  "id": 1002,
+  "name": "mrcode-2",
+  "desc": "mrcode is very fashion，非常时尚！",
+  "create_date": "2021-08-12"
+}
+
+### 增加测试数据
+PUT http://192.168.56.105:9200/my_doc/_doc/3
+Content-Type: application/json
+
+{
+  "id": 1003,
+  "name": "mrcode-3",
+  "desc": "mrcode is niubility，很好很强大！",
+  "create_date": "2021-08-13"
+}
+
+### 增加测试数据
+PUT http://192.168.56.105:9200/my_doc/_doc/4
+Content-Type: application/json
+
+{
+  "id": 1004,
+  "name": "mrcode-4",
+  "desc": "mrcode is good~!",
+  "create_date": "2021-08-14"
+}
+
+### 增加测试数据
+PUT http://192.168.56.105:9200/my_doc/_doc/5
+Content-Type: application/json
+
+{
+  "id": 1005,
+  "name": "mrcode-5",
+  "desc": "凉茶 is 强大！",
+  "create_date": "2021-08-15"
+}
+
+### 增加测试数据，自动 ID
+PUT http://192.168.56.105:9200/my_doc/_doc/
+Content-Type: application/json
+
+{
+  "id": 1006,
+  "name": "mrcode-6",
+  "desc": "凉茶爱学习，凉茶笔记！",
+  "create_date": "2021-08-16"
+}
+
+### 增加测试数据，自动 ID
+PUT http://192.168.56.105:9200/my_doc/_doc/
+Content-Type: application/json
+
+{
+  "id": 1007,
+  "name": "mrcode-7",
+  "desc": "凉茶爱学习，凉茶笔记！222222",
+  "create_date": "2021-08-17"
+}
+
+### 删除 id为  5 的数据
+DELETE http://192.168.56.105:9200/my_doc/_doc/5
+
+### 修改 id 为 1 的数据
+POST http://192.168.56.105:9200/my_doc/_update/1
+Content-Type: application/json
+
+{
+  "doc": {
+    "name": "今天连跪 10 局"
+  }
+}
+
+### 通过 ID 查询
+GET http://192.168.56.105:9200/my_doc/_doc/1
+
+### 只返回部分字段
+GET http://192.168.56.105:9200/my_doc/_doc/1?_source=id,name
+
+### _search api
+GET http://192.168.56.105:9200/my_doc/_search
+
+### 判断文档是否存在
+HEAD http://192.168.56.105:9200/my_doc/_doc/1
+
+### 乐观锁 - 创建文档
+PUT http://192.168.56.105:9200/my_doc/_doc/2001
+Content-Type: application/json
+
+{
+  "id": 2001,
+  "name": "mrcode-7",
+  "desc": "凉茶爱学习，凉茶笔记！222222",
+  "create_date": "2021-08-17"
+}
+
+###
+GET http://192.168.56.105:9200/my_doc/_doc/2001
+
+### 乐观锁更新
+POST http://192.168.56.105:9200/my_doc/_update/2001?if_seq_no=9&if_primary_term=1
+Content-Type: application/json
+
+{
+  "doc": {
+    "name": "mrcode-2001"
+  }
+}
+
+### 标准分词器：分词
+GET http://192.168.56.105:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "standard",
+  "text": "Quick Brown Foxes!"
+}
+
+### ik 分词器
+GET http://192.168.56.105:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "ik_max_word",
+  "text": "上下班车流量很大"
+}
+
+### ik 分词器
+GET http://192.168.56.105:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "ik_smart",
+  "text": "上下班车流量很大"
+}
+
+### ik 分词器：不支持的网络用语
+GET http://192.168.56.105:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "ik_smart",
+  "text": "骚年，你妈妈喊你回家吃饭"
+}
+
+### 创建 DSL 搜索 index
+PUT http://192.168.56.105:9200/shop
+Content-Type: application/json
+
+{
+  "settings": {
+    "number_of_shards": 2,
+    "number_of_replicas": 0
+  }
+}
+
+### 创建 DSL 搜索: mapping
+POST http://192.168.56.105:9200/shop/_mapping
+Content-Type: application/json
+
+{
+  "properties": {
+    "id": {
+      "type": "long"
+    },
+    "age": {
+      "type": "integer"
+    },
+    "username": {
+      "type": "keyword"
+    },
+    "nickname": {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "money": {
+      "type": "float"
+    },
+    "desc": {
+      "type": "text",
+      "analyzer": "ik_max_word"
+    },
+    "sex": {
+      "type": "byte"
+    },
+    "birthday": {
+      "type": "date"
+    },
+    "face": {
+      "type": "text",
+      "index": false
+    }
+  }
+}
+
+###
+DELETE http://192.168.56.105:9200/shop/_doc/1001
+
+### 准备测试数据
+PUT http://192.168.56.105:9200/shop/_doc/1001
+Content-Type: application/json
+
+{
+  "id": 1001,
+  "age": 18,
+  "username": "mrcodeAmazing",
+  "nickname": "凉茶铺",
+  "money": 88.8,
+  "desc": "我在凉茶铺学习java和前端，学习到了很多知识",
+  "sex": 0,
+  "birthday": "1992-12-24",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1002
+Content-Type: application/json
+
+{
+  "id": 1002,
+  "age": 19,
+  "username": "justbuy",
+  "nickname": "周杰棍",
+  "money": 77.8,
+  "desc": "今天上下班都很堵，车流量很大",
+  "sex": 1,
+  "birthday": "1993-01-24",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1003
+Content-Type: application/json
+
+{
+  "id": 1003,
+  "age": 20,
+  "username": "bigFace",
+  "nickname": "飞翔的巨鹰",
+  "money": 66.8,
+  "desc": "凉茶铺团队和导游坐飞机去海外旅游，去了新马泰和欧洲",
+  "sex": 1,
+  "birthday": "1996-01-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1004
+Content-Type: application/json
+
+{
+  "id": 1004,
+  "age": 22,
+  "username": "flyfish",
+  "nickname": "水中鱼",
+  "money": 55.8,
+  "desc": "昨天在学校的池塘里，看到有很多鱼在游泳，然后就去凉茶铺上课了",
+  "sex": 0,
+  "birthday": "1988-02-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1005
+Content-Type: application/json
+
+{
+  "id": 1005,
+  "age": 25,
+  "username": "gotoplay",
+  "nickname": "ps游戏机",
+  "money": 155.8,
+  "desc": "今年生日，女友送了我一台play station游戏机，非常好玩，非常不错",
+  "sex": 1,
+  "birthday": "1989-03-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1006
+Content-Type: application/json
+
+{
+  "id": 1006,
+  "age": 19,
+  "username": "missmrcode",
+  "nickname": "我叫小凉",
+  "money": 156.8,
+  "desc": "我叫凌云彻，今年20岁，是一名律师，我在奇葩星球做演讲",
+  "sex": 1,
+  "birthday": "1993-04-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1007
+Content-Type: application/json
+
+{
+  "id": 1007,
+  "age": 19,
+  "username": "msgame",
+  "nickname": "gamexbox",
+  "money": 1056.8,
+  "desc": "明天去进货，最近微软处理很多游戏机，还要买xbox游戏卡带",
+  "sex": 1,
+  "birthday": "1985-05-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1008
+Content-Type: application/json
+
+{
+  "id": 1008,
+  "age": 19,
+  "username": "mrco",
+  "nickname": "凉学习",
+  "money": 1056.8,
+  "desc": "大学毕业后，可以到mrcode.cn进修",
+  "sex": 1,
+  "birthday": "1995-06-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1009
+Content-Type: application/json
+
+{
+  "id": 1009,
+  "age": 22,
+  "username": "shaonian",
+  "nickname": "骚年轮",
+  "money": 96.8,
+  "desc": "骚年在大学毕业后，考研究生去了",
+  "sex": 1,
+  "birthday": "1998-07-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1010
+Content-Type: application/json
+
+{
+  "id": 1010,
+  "age": 30,
+  "username": "tata",
+  "nickname": "隔壁老王",
+  "money": 100.8,
+  "desc": "隔壁老王去国外出差，带给我很多好吃的",
+  "sex": 1,
+  "birthday": "1988-07-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1011
+Content-Type: application/json
+
+{
+  "id": 1011,
+  "age": 31,
+  "username": "sprder",
+  "nickname": "皮特帕克",
+  "money": 180.8,
+  "desc": "他是一个超级英雄",
+  "sex": 1,
+  "birthday": "1989-08-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+###
+PUT http://192.168.56.105:9200/shop/_doc/1012
+Content-Type: application/json
+
+{
+  "id": 1012,
+  "age": 31,
+  "username": "super hero",
+  "nickname": "super hero",
+  "money": 188.8,
+  "desc": "BatMan，GreenArrow，SpiderMan，IronMan...  are all Super Hero",
+  "sex": 1,
+  "birthday": "1980-08-14",
+  "face": "https://www.imooc.com/static/img/index/logo.png"
+}
+
+### q 参数查询
+GET http://192.168.56.105:9200/shop/_search?q=desc:凉茶铺
+
+### q 参数查询,多条件
+GET http://192.168.56.105:9200/shop/_search?q=desc:凉茶铺&q=age:20
+
+### text 类型全文检索到数据
+GET http://192.168.56.105:9200/shop/_search?q=nickname:super
+
+### keyword 部分查询不到数据
+GET http://192.168.56.105:9200/shop/_search?q=username:super
+
+### keyword 类型精准查询
+GET http://192.168.56.105:9200/shop/_search?q=username:super hero
+
+### match
+POST http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "desc": "凉茶铺"
+    }
+  }
+}
+
+### 文档字段是否存在
+POST http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "exists": {
+      "field": "desc"
+    }
+  }
+}
+
+### 查询所有
+GET http://192.168.56.105:9200/shop/_search
+
+### 查询所有 matchall
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+### 分页：第 1 页
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 2,
+  "sort": "id:ascending"
+}
+
+### 分页：第 2 页
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 2,
+  "size": 2,
+  "sort": "id"
+}
+
+### term
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "term": {
+      "desc": "凉茶铺强大"
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### match_phrase
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_phrase": {
+      "desc": {
+        "query": "大学 研究生",
+        "slop": 3
+      }
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### ik 分词器
+GET http://192.168.56.105:9200/_analyze
+Content-Type: application/json
+
+{
+  "analyzer": "ik_max_word",
+  "text": "我女友生日送我好玩的xbox游戏机"
+}
+
+### match operator
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "desc": {
+        "query": "凉茶铺学习",
+        "operator": "and"
+      }
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### match minimum_should_match
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match": {
+      "desc": {
+        "query": "女友生日送我好玩的xbox游戏机",
+        "minimum_should_match": 5
+      }
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### ids
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "ids": {
+      "values": [
+        1001,
+        1002
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### multi_match
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "multi_match": {
+      "query": "皮特帕克凉茶铺",
+      "fields": [
+        "desc",
+        "nickname^10"
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### bool：must
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "multi_match": {
+            "query": "凉茶铺",
+            "fields": [
+              "desc",
+              "nickname"
+            ]
+          }
+        },
+        {
+          "term": {
+            "sex": 0
+          }
+        },
+        {
+          "term": {
+            "birthday": "1992-12-24"
+          }
+        }
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "sex",
+    "nickname",
+    "birthday",
+    "desc"
+  ]
+}
+
+### bool：should
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "should": [
+        {
+          "multi_match": {
+            "query": "凉茶铺",
+            "fields": [
+              "desc",
+              "nickname"
+            ]
+          }
+        },
+        {
+          "term": {
+            "sex": 0
+          }
+        },
+        {
+          "term": {
+            "birthday": "1992-12-24"
+          }
+        }
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "sex",
+    "nickname",
+    "birthday",
+    "desc"
+  ]
+}
+
+### bool：must_not
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must_not": [
+        {
+          "multi_match": {
+            "query": "凉茶铺",
+            "fields": [
+              "desc",
+              "nickname"
+            ]
+          }
+        },
+        {
+          "term": {
+            "sex": 0
+          }
+        },
+        {
+          "term": {
+            "birthday": "1992-12-24"
+          }
+        }
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "sex",
+    "nickname",
+    "birthday",
+    "desc"
+  ]
+}
+
+### bool：三种一起使用
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "nickname": "凉"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "sex": 1
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "term": {
+            "birthday": "1993-04-14"
+          }
+        }
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "sex",
+    "nickname",
+    "birthday",
+    "desc"
+  ]
+}
+
+###
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "multi_match": {
+            "query": "凉茶铺",
+            "fields": [
+              "desc",
+              "nickname"
+            ]
+          }
+        },
+        {
+          "term": {
+            "sex": 0
+          }
+        },
+        {
+          "term": {
+            "birthday": "1992-12-24"
+          }
+        }
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "sex",
+    "nickname",
+    "birthday",
+    "desc"
+  ]
+}
+
+### post_filter
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "desc": "凉茶铺游戏"
+          }
+        }
+      ]
+    }
+  },
+  "post_filter": {
+    "range": {
+      "money": {
+        "gt": 60,
+        "lt": 1000
+      }
+    }
+  }
+}
+
+### sort 排序
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "desc": "凉茶铺游戏"
+          }
+        }
+      ]
+    }
+  },
+  "highlight": {
+    "pre_tags": [
+      "<tag1>"
+    ],
+    "post_tags": [
+      "< /tag1>"
+    ],
+    "fields": {
+      "desc": {}
+    }
+  }
+}
+
+### 超过 1 万条数据，报错
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 9999,
+  "size": 2
+}
+
+### 查看 settings 信息
+GET http://192.168.56.105:9200/shop/_settings
+
+### 设置分页最大限制
+
+PUT http://192.168.56.105:9200/shop/_settings
+Content-Type: application/json
+
+{
+  "index": {
+    "max_result_window": 120000
+  }
+}
+
+### scroll 滚动搜索
+GET http://192.168.56.105:9200/shop/_search?scroll=1m
+Content-Type: application/json
+
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    "_doc"
+  ],
+  "size": 5
+}
+
+### scroll
+GET http://192.168.56.105:9200/_search/scroll
+Content-Type: application/json
+
+{
+  "scroll_id": "DnF1ZXJ5VGhlbkZldGNoAgAAAAAAAAFSFlc4bnEyV0JCUWU2Z1dsaUc0RXlLd2cAAAAAAAABUxZXOG5xMldCQlFlNmdXbGlHNEV5S3dn",
+  "scroll": "1m"
+}
+
+### 批量获取
+GET http://192.168.56.105:9200/shop/_search
+Content-Type: application/json
+
+{
+  "query": {
+    "ids": {
+      "values": [
+        1001,
+        1002
+      ]
+    }
+  },
+  "_source": [
+    "id",
+    "nickname",
+    "desc"
+  ]
+}
+
+### mget
+GET http://192.168.56.105:9200/shop/_mget
+Content-Type: application/json
+
+{
+  "ids": [
+    1001,
+    1003,
+    1005
+  ]
+}
+
+### mget
+GET http://192.168.56.105:9200/shop/_mget
+Content-Type: application/json
+
+{
+  "ids": [
+    1001,
+    100300
+  ]
+}
+
+
+### 批量新增文档
+POST http://192.168.56.105:9200/_bulk
+Content-Type: application/json
+
+{"create": {"_index": "shop", "_type": "_doc"}}
+{"id":"2001","nickname":"name-2001"}
+{"create": {"_index": "shop", "_type": "_doc"}}
+{"id":"2002","nickname":"name-2003"}
+{"create": {"_index": "shop", "_type": "_doc"}}
+{"id":"2003","nickname":"name-2003"}
+
+
