@@ -88,7 +88,8 @@
 								<li v-for="(item, index) in itemsList" :key="index" @click="showItemDetail(item.itemId)">
 									<div class="i-pic limit">
 										<img :src="item.imgUrl" />
-										<p class="title fl">{{item.itemName}}</p>
+										<!--<p class="title fl">{{item.itemName}}</p> -->
+										<p class="title fl" v-html="item.itemName"></p>
 										<p class="price fl">
 											<b>¥</b>
 											<strong>{{item.price / 100}}</strong>
@@ -353,7 +354,8 @@
 				},
 				searchInBackend(keywords, sort, page, pageSize) {
 					// debugger;
-					var serverUrl = app.serverUrl;
+					// var serverUrl = app.serverUrl;
+					var serverUrl = "http://localhost:9001";
 					axios.defaults.withCredentials = true;
 					axios.get(serverUrl + '/items/search?keywords=' + keywords + "&sort=" + sort + "&page=" + page + "&pageSize=" + pageSize, {})
 						.then(res => {

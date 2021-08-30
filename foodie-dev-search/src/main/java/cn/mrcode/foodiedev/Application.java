@@ -8,7 +8,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 import tk.mybatis.spring.annotation.MapperScan;
 
-@SpringBootApplication
+@SpringBootApplication(
+        scanBasePackages = {"cn.mrcode.foodiedev"},
+        exclude = {SecurityAutoConfiguration.class}
+)
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

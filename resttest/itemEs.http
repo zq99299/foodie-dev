@@ -1,0 +1,2 @@
+### 从 es 搜索商品
+GET http://localhost:9001/items/search?keywords=吃货&sort=k&page=4&pageSize=20
