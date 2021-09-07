@@ -1,4 +1,4 @@
-package cn.mrcode.foodiedev.es.controller;
+package cn.mrcode.foodiedev.fs.controller;
 
 import cn.mrcode.foodiedev.common.util.JSONResult;
 import cn.mrcode.foodiedev.common.util.PagedGridResult;

@@ -227,7 +227,8 @@
 						var userInfo = this.userInfo;
 						// console.log(userInfo);
 						// 请求后端获得最新数据
-						var serverUrl = app.serverUrl;
+						// var serverUrl = app.serverUrl;
+						var serverUrl = "http://localhost:9002";
 						axios.defaults.withCredentials = true;
 						axios.post(
 								serverUrl + '/userInfo/uploadFace?userId=' + userInfo.id, 
