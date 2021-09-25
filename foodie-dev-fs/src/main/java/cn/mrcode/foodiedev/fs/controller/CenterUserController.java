@@ -46,8 +46,8 @@ public class CenterUserController extends BaseController {
      * @return
      */
     @ApiOperation(value = "用户头像修改", notes = "用户头像修改", httpMethod = "POST")
-    @PostMapping("uploadFace")
-    public JSONResult uploadFace(
+    @PostMapping("uploadFace-fs")
+    public JSONResult uploadFaceFs(
             @ApiParam(name = "userId", value = "用户id", required = true)
             @RequestParam String userId,
             @ApiParam(name = "file", value = "用户头像", required = true) MultipartFile file,
@@ -82,6 +82,54 @@ public class CenterUserController extends BaseController {
         // 由于浏览器可能存在缓存的情况，所以在这里，我们需要加上时间戳来保证更新后的图片可以及时刷新
         // 拼接上 fastfs 的访问地址
         String finalUserFaceUrl = "http://192.168.56.106:8888/" + userFaceUrl + "?t=" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
+
+        // 更新用户头像到数据库
+        Users userResult = centerUserService.updateUserFace(userId, finalUserFaceUrl);
+
+        // 转换，并重新生成 token 放入 redis 中
+        UsersVO usersVO = convertVo(userResult);
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
+
+        return JSONResult.ok();
+    }
+
+    @ApiOperation(value = "用户头像修改", notes = "用户头像修改", httpMethod = "POST")
+    @PostMapping("uploadFace")
+    public JSONResult uploadFace(
+            @ApiParam(name = "userId", value = "用户id", required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "file", value = "用户头像", required = true) MultipartFile file,
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        String userFaceUrl = null;
+        // 开始文件上传
+        if (file != null) {
+            // 获得文件上传的文件名称
+            String fileName = file.getOriginalFilename();
+
+            if (StringUtils.isNotBlank(fileName)) {
+
+                // 文件重命名  imooc-face.png -> ["imooc-face", "png"]
+                String fileNameArr[] = fileName.split("\\.");
+
+                // 获取文件的后缀名
+                String suffix = fileNameArr[fileNameArr.length - 1];
+
+                if (!suffix.equalsIgnoreCase("png") &&
+                        !suffix.equalsIgnoreCase("jpg") &&
+                        !suffix.equalsIgnoreCase("jpeg")) {
+                    return JSONResult.errorMsg("图片格式不正确！");
+                }
+                userFaceUrl = fdfsService.uploadOSS(file, suffix, userId);
+                System.out.println(userFaceUrl);
+            }
+        } else {
+            return JSONResult.errorMsg("文件不能为空！");
+        }
+
+        // 由于浏览器可能存在缓存的情况，所以在这里，我们需要加上时间戳来保证更新后的图片可以及时刷新
+        // 拼接上 fastfs 的访问地址
+        String finalUserFaceUrl = userFaceUrl + "?t=" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
 
         // 更新用户头像到数据库
         Users userResult = centerUserService.updateUserFace(userId, finalUserFaceUrl);

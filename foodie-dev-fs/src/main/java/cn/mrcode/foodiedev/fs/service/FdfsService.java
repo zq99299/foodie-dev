@@ -10,4 +10,6 @@ import java.io.IOException;
  */
 public interface FdfsService {
     String upload(MultipartFile file, String fileExtName) throws IOException;
+
+    String uploadOSS(MultipartFile file, String fileExtName, String userId) throws IOException;
 }

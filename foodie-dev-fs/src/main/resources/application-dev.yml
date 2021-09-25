@@ -15,3 +15,12 @@ spring:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+ali-oss:
+  # 在你创建的 bucket 概览页面里面有 Endpoint（地域节点） 信息，找其种一个即可
+  endpoint: oss-cn-beijing.aliyuncs.com
+  access-key-id: xO3yYN9aK6l8j4nK
+  access-key-secret: xxx
+  bucket: mrcode-test
+  # 图片访问地址，也在概览页里面有
+  host: https://mrcode-test.oss-cn-beijing.aliyuncs.com/
