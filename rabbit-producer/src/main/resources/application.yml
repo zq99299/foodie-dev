@@ -1,0 +1,33 @@
+server:
+  port: 9010
+  tomcat:
+    uri-encoding: utf-8
+  max-http-header-size: 80KB
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+
+  rabbitmq:
+    # 集群的话，用英文逗号分隔
+    addresses: 127.0.0.1:5672
+    username: guest
+    password: guest
+    # 默认是 / ，可以按不同的项目来分
+    virtual-host: /
+    # 链接超时
+    connection-timeout: 15s
+    # 消息确认
+    # publisher-confirms 已过期，源码中设置为 true 会设置为 correlated 类型
+    # publisher-confirms: true
+    publisher-confirm-type: correlated
+    # 如果使用返回消息的话，需要配合 template.mandatory 一起使用
+    # publisher-returns: true
+    # template:
+      # mandatory: true

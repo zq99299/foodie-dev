@@ -1,0 +1,38 @@
+server:
+  port: 9011
+  tomcat:
+    uri-encoding: utf-8
+  max-http-header-size: 80KB
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+
+  rabbitmq:
+    # 集群的话，用英文逗号分隔
+    addresses: 127.0.0.1:5672
+    username: guest
+    password: guest
+    # 默认是 / ，可以按不同的项目来分
+    virtual-host: /
+    # 链接超时
+    connection-timeout: 15s
+
+    listener:
+      simple:
+        # 消费者成功消费消息后，需要手工做 ack 操作。默认为 auto
+        acknowledge-mode: manual
+        # 消费者并发线程数量
+        concurrency: 5
+        # 最大消费并发线程数量
+        max-concurrency: 10
+        # 消息预取数量
+        prefetch: 1
+
+
