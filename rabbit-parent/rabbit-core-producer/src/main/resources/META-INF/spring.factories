@@ -1,0 +1,3 @@
+# spring starter ??????
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+cn.mrcode.rabbit.producer.autoconfigure.RabbitProducerAutoConfiguration

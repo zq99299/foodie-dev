@@ -17,7 +17,7 @@ public class Message implements Serializable {
      */
     private String messageId;
     /**
-     * 消息主题
+     * 消息主题; 也就是交换器
      */
     private String topic;
     /**

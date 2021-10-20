@@ -15,5 +15,17 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
     </properties>
-
+    <dependencies>
+        <!-- API 接口是非常单纯的，common 又是公用的，引用进来-->
+        <dependency>
+            <groupId>cn.mrcode.base.rabbit</groupId>
+            <artifactId>rabbit-api</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <!-- rabbit -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+    </dependencies>
 </project>
