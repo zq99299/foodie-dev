@@ -1,6 +1,7 @@
 .gradle
 /build/
 */target/
+*/*/target/
 /logs/
 /tempresource/
 
