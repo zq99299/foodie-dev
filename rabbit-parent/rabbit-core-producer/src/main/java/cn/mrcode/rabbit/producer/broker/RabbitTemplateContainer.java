@@ -3,6 +3,11 @@ package cn.mrcode.rabbit.producer.broker;
 import cn.mrcode.rabbit.api.Message;
 import cn.mrcode.rabbit.api.MessageType;
 import cn.mrcode.rabbit.api.exception.MessageRunTimeException;
+import cn.mrcode.rabbit.common.converter.GenericMessageConverter;
+import cn.mrcode.rabbit.common.converter.RabbitMessageConverter;
+import cn.mrcode.rabbit.common.serializer.Serializer;
+import cn.mrcode.rabbit.common.serializer.SerializerFactory;
+import cn.mrcode.rabbit.common.serializer.impl.JacksonSerializerFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -24,6 +29,7 @@ import java.util.Map;
  *    1. 提高发送效率
  *    2. 可以根据不同的需求制定不同的 RabbitTemplate
  * </pre>
+ *
  * @author mrcode
  * @date 2021/10/25 22:26
  */
@@ -36,8 +42,11 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
     // 构建一个分割器，以 # 分隔
     private Splitter splitter = Splitter.on("#");
 
+    private SerializerFactory serializerFactory = JacksonSerializerFactory.INSTANCE;
+
     /**
      * 根据消息为每一个 topic（交换器）产生一个 RabbitTemplate
+     *
      * @param message
      * @return
      * @throws MessageRunTimeException
@@ -54,8 +63,12 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
         newRabbitTemplate.setExchange(topic);
         newRabbitTemplate.setRetryTemplate(new RetryTemplate());
         newRabbitTemplate.setRoutingKey(message.getRoutingKey());
-        // 对 message 的序列化
-        // newRabbitTemplate.setMessageConverter(messageConverter);
+
+        // 对 message 的序列化: 使用我们自己的消息转换器
+        Serializer serializer = serializerFactory.create();
+        GenericMessageConverter genericMessageConverter = new GenericMessageConverter(serializer);
+        RabbitMessageConverter rabbitMessageConverter = new RabbitMessageConverter(genericMessageConverter);
+        newRabbitTemplate.setMessageConverter(rabbitMessageConverter);
 
         String messageType = message.getMessageType();
         // 只要不是迅速消息，就设置上：发送方法回调确认
