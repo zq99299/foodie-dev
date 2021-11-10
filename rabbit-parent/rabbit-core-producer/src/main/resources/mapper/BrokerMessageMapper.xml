@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.mrcode.rabbit.producer.mapper.BrokerMessageMapper">
+    <resultMap id="BaseResultMap" type="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        <id column="message_id" jdbcType="VARCHAR" property="messageId"/>
+        <result column="message" jdbcType="VARCHAR" property="message" typeHandler="cn.mrcode.rabbit.api.Message"/>
+        <result column="try_count" jdbcType="INTEGER" property="tryCount"/>
+        <result column="status" jdbcType="VARCHAR" property="status"/>
+        <result column="next_retry" jdbcType="TIMESTAMP" property="nextRetry"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        message_id, message, try_count, status, next_retry, create_time, update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from broker_message
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from broker_message
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        insert into broker_message (message_id, message, try_count,
+                                    status, next_retry, create_time,
+                                    update_time)
+        values (#{messageId,jdbcType=VARCHAR}, #{message,jdbcType=VARCHAR}, #{tryCount,jdbcType=INTEGER},
+                #{status,jdbcType=VARCHAR}, #{nextRetry,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        insert into broker_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="messageId != null">
+                message_id,
+            </if>
+            <if test="message != null">
+                message,
+            </if>
+            <if test="tryCount != null">
+                try_count,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="nextRetry != null">
+                next_retry,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="messageId != null">
+                #{messageId,jdbcType=VARCHAR},
+            </if>
+            <if test="message != null">
+                #{message,jdbcType=VARCHAR},
+            </if>
+            <if test="tryCount != null">
+                #{tryCount,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="nextRetry != null">
+                #{nextRetry,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        update broker_message
+        <set>
+            <if test="message != null">
+                message = #{message,jdbcType=VARCHAR},
+            </if>
+            <if test="tryCount != null">
+                try_count = #{tryCount,jdbcType=INTEGER},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=VARCHAR},
+            </if>
+            <if test="nextRetry != null">
+                next_retry = #{nextRetry,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        update broker_message
+        set message = #{message,jdbcType=VARCHAR},
+            try_count = #{tryCount,jdbcType=INTEGER},
+            status = #{status,jdbcType=VARCHAR},
+            next_retry = #{nextRetry,jdbcType=TIMESTAMP},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </update>
+    <update id="changeBrokerMessageStatus" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
+        update broker_message
+        set status = status = #{status,jdbcType=VARCHAR},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </update>
+    <select id="queryBrokerMessageStatus4Timeout" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from broker_message
+        where `status` = #{messageStatus,jdbcType=VARCHAR}
+                and next_retry &lt; sysdaate()
+    </select>
+    <select id="queryBrokerMessageStatus" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List" />
+        from broker_message
+        where `status` = #{messageStatus,jdbcType=VARCHAR}
+    </select>
+    <update id="update4TryCount">
+        update broker_message
+        set
+            try_count = #{tryCount,jdbcType=INTEGER},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where message_id = #{messageId,jdbcType=VARCHAR}
+    </update>
+</mapper>
