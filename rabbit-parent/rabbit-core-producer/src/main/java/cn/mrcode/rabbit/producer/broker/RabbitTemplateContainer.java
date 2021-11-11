@@ -8,6 +8,7 @@ import cn.mrcode.rabbit.common.converter.RabbitMessageConverter;
 import cn.mrcode.rabbit.common.serializer.Serializer;
 import cn.mrcode.rabbit.common.serializer.SerializerFactory;
 import cn.mrcode.rabbit.common.serializer.impl.JacksonSerializerFactory;
+import cn.mrcode.rabbit.producer.service.MessageStoreService;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
@@ -43,6 +44,9 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
     private Splitter splitter = Splitter.on("#");
 
     private SerializerFactory serializerFactory = JacksonSerializerFactory.INSTANCE;
+
+    @Autowired
+    private MessageStoreService messageStoreService;
 
     /**
      * 根据消息为每一个 topic（交换器）产生一个 RabbitTemplate
@@ -98,6 +102,8 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
         long sendTime = Long.parseLong(idItems.get(1));
         if (ack) {
             // ack 为 true 表示 MQ 已经确认收到消息
+            // 当 ack 为 true 的时候，则更新日志
+            messageStoreService.success(messageId);
             log.info("#RabbitTemplateContainer.confirm# send message is OK, confirm messageId: {},sendTime: {}", messageId, sendTime);
         } else {
             log.error("#RabbitTemplateContainer.confirm# send message is Fail, confirm messageId: {},sendTime: {},cause: {}", messageId, sendTime, cause);

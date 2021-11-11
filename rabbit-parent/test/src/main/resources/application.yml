@@ -1,0 +1,24 @@
+server:
+  port: 9020
+  tomcat:
+    uri-encoding: utf-8
+  max-http-header-size: 80KB
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+
+  rabbitmq:
+    # 集群的话，用英文逗号分隔
+    addresses: 127.0.0.1:5672
+    username: guest
+    password: guest
+    # 默认是 / ，可以按不同的项目来分
+    virtual-host: /
+    connection-timeout: 15s
