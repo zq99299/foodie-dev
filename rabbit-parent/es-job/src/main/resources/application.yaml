@@ -1,0 +1,27 @@
+server:
+  port: 8881
+
+zookeeper:
+  address: 192.168.1.1
+  namespace: elastic-job
+  connectionTimeout: 10000
+  sessionTimeout: 10000
+  maxRetries: 3
+
+simpleJob:
+  cron: 0/5 * * * *?
+  shardingTotalCount: 5
+  shardingItemParameters: 0=beijing,1=shanghai,2=changchun
+  jobParameter: source1=public,source2=private
+  failover: true
+  monitorExecution: true
+  monitorPort: 8889
+  maxTimeDiffSeconds: 1
+  jobShardingStrategyClass: com.dangdang.ddframe.job.lite
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/elasticjob?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver

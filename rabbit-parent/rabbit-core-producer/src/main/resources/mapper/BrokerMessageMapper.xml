@@ -3,7 +3,7 @@
 <mapper namespace="cn.mrcode.rabbit.producer.mapper.BrokerMessageMapper">
     <resultMap id="BaseResultMap" type="cn.mrcode.rabbit.producer.entity.BrokerMessage">
         <id column="message_id" jdbcType="VARCHAR" property="messageId"/>
-        <result column="message" jdbcType="VARCHAR" property="message" typeHandler="cn.mrcode.rabbit.api.Message"/>
+        <result column="message" jdbcType="VARCHAR" property="message"/>
         <result column="try_count" jdbcType="INTEGER" property="tryCount"/>
         <result column="status" jdbcType="VARCHAR" property="status"/>
         <result column="next_retry" jdbcType="TIMESTAMP" property="nextRetry"/>

@@ -25,7 +25,8 @@ public class ProducerClient implements MessageProducer {
         // 如果 topic 为 null 就抛出空指针异常
         String topic = message.getTopic();
         Preconditions.checkNotNull(topic);
-        switch (topic) {
+        String messageType = message.getMessageType();
+        switch (messageType) {
             case MessageType.RAPID:
                 rabbitBroker.rapidSend(message);
                 break;

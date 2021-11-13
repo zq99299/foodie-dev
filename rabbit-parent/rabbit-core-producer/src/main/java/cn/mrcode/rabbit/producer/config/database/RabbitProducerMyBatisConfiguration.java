@@ -32,7 +32,10 @@ public class RabbitProducerMyBatisConfiguration {
             // 这里设置的是 mapper.xml 的路径
             bean.setMapperLocations(resolver.getResources("classpath:mapper/*.xml"));
 
+            // 设置 实体类 BrokerMessage 中的 Message 对象处理
+            bean.setTypeHandlersPackage("cn.mrcode.rabbit.producer.entity.typehander");
             SqlSessionFactory sqlSessionFactory = bean.getObject();
+
             // 开启缓存？
             sqlSessionFactory.getConfiguration().setCacheEnabled(Boolean.TRUE);
             return sqlSessionFactory;

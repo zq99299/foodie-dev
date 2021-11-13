@@ -23,6 +23,7 @@
         <module>rabbit-core-producer</module>
         <module>rabbit-task</module>
         <module>test</module>
+        <module>es-job</module>
     </modules>
 
     <!-- 设置资源属性-->

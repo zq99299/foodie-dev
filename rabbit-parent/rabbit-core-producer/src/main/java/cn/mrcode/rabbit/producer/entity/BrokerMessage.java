@@ -1,6 +1,7 @@
 package cn.mrcode.rabbit.producer.entity;
 
 import cn.mrcode.rabbit.api.Message;
+import org.apache.ibatis.type.MappedTypes;
 
 import java.io.Serializable;
 import java.util.Date;
