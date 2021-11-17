@@ -1,26 +1,53 @@
 server:
   port: 8881
 
+# 这个名称自定义的，因为我们需要自己读取这些配置
 zookeeper:
-  address: 192.168.1.1
+  # 对应的配置类是 com.dangdang.ddframe.job.reg.zookeeper.ZookeeperConfiguration
+  # zk 服务器列表，多个用逗号分隔
+  address: 127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183
   namespace: elastic-job
+  # 连接超时时间. 单位毫秒.
   connectionTimeout: 10000
+  # 会话超时时间. 单位毫秒.
   sessionTimeout: 10000
+  # 最大重试次数
   maxRetries: 3
 
+# 这个名称自定义的，因为我们需要自己读取这些配置
 simpleJob:
-  cron: 0/5 * * * *?
+  # 时间表达式， 5 秒运行一次
+  cron: 0/5 * * * * ?
+  # 分片数量：假设有 5 台服务器
+  # 假设分片设置为 5，但是你只启动一个服务，也没有分片参数的话
+  ## 那么，这一个服务上就会启动 5 个线程来执行任务
+  ## 假设你启动 2 个服务，那么一个服务上会启动 3 个线程，另一个服务上会启动 2 个线程运行
   shardingTotalCount: 5
-  shardingItemParameters: 0=beijing,1=shanghai,2=changchun
+  # 分片参数：每个参数会使用一个分片来执行，这个参数所代表的含义就是，比如你可以使用此参数去查询数据库，里面查询到的数据就是你这个分片要处理的数据
+  # 需要注意的是：这个分片配置要小于等于 分片数量
+  # 等号左边的是分片索引，右边的是你的分片值
+  shardingItemParameters: 0=beijing,1=shanghai,2=changchun,3=changsha,4=hangzhou
+  # job 参数：携带自己的参数，可能会用到
   jobParameter: source1=public,source2=private
+  # 失败的情况下，是否做一些失败转移
+  # 简单说：假设你只有 2 台机器，但是分片设置为 5，那么一台会处理 3 个分片的数据，一台会处理 2 个分片的数据
+  # 当其中一个分片发生故障的时候，无法执行任务时，将这个任务转移到另外的分片上执行
   failover: true
+  # 监控
   monitorExecution: true
+  # 监控端口
   monitorPort: 8889
-  maxTimeDiffSeconds: 1
-  jobShardingStrategyClass: com.dangdang.ddframe.job.lite
+  # 最大的误差时间，zk 上会记录一些时间信息
+  # 还有执行作业的 JOB 机器，这些机器上的时间与 zk 上的时间误差允许范围是多少，
+  # 在范围外就会报错,-1 则忽略
+  maxTimeDiffSeconds: -1
+  # 分片策略: com.dangdang.ddframe.job.lite.api.strategy.JobShardingStrategy
+  # AverageAllocationJobShardingStrategy: 基于平均分配算法的策略，如果分片不能整除, 则不能整除的多余分片将依次追加到序号小的服务器
+  jobShardingStrategyClass: com.dangdang.ddframe.job.lite.api.strategy.impl.AverageAllocationJobShardingStrategy
 
 spring:
   datasource:
+    # 记得要创建一个数据库
     url: jdbc:mysql://localhost:3306/elasticjob?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
     username: root
     password: root
