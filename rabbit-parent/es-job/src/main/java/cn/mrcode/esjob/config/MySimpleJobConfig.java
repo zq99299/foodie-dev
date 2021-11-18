@@ -140,7 +140,7 @@ public class MySimpleJobConfig {
                 // 如果可覆盖, 每次启动作业都以本地配置为准
                 // 可能在 zk 上已经存在该配置了（以前注册过，比如再次重启该服务，就会注册一次），以 zk 上的为准，还是以本地的为主
                 // 以 zk 为主的话，一般使用场景是：使用控制台添加，任务，直接在 zk 上添加配置信息
-                .overwrite(true)
+                .overwrite(false)
                 .build();
         return liteJobConfiguration;
     }
