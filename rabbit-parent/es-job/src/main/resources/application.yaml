@@ -45,6 +45,12 @@ simpleJob:
   # AverageAllocationJobShardingStrategy: 基于平均分配算法的策略，如果分片不能整除, 则不能整除的多余分片将依次追加到序号小的服务器
   jobShardingStrategyClass: com.dangdang.ddframe.job.lite.api.strategy.impl.AverageAllocationJobShardingStrategy
 
+# 流式 job
+dataflowJob:
+  cron: 0/10 * * * * ?
+  shardingTotalCount: 1
+  shardingItemParameters: 0=beijing,1=shanghai
+
 spring:
   datasource:
     # 记得要创建一个数据库
