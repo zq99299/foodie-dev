@@ -74,11 +74,11 @@ public class DataFlowJobConfig {
                                 // class 全限定名称 cn.mrcode.xx
                                 jobClass.getCanonicalName(),
                                 // streamingProcess 是否是流式处理
-                                false
+                                true
                         )
                 )
                 // 不覆盖 zk 配置
-                .overwrite(true)
+                .overwrite(false)
                 .build();
     }
 }
