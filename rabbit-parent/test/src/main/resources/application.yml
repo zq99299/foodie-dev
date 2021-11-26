@@ -22,3 +22,9 @@ spring:
     # 默认是 / ，可以按不同的项目来分
     virtual-host: /
     connection-timeout: 15s
+
+elastic:
+  job:
+    zk:
+      namespace: "test-job"
+      server-lists: "127.0.0.1:2181,127.0.0.1:2182,127.0.0.1:2183"

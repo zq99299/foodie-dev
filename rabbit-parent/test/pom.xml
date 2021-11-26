@@ -31,5 +31,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>cn.mrcode.base.rabbit</groupId>
+            <artifactId>rabbit-task</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>
