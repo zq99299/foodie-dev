@@ -40,8 +40,15 @@ public class JobParserAutoConfiguration {
         return new ZookeeperRegistryCenter(zkConfig);
     }
 
+    /**
+     * 初始化解析类，让解析类的 ApplicationReadyEvent 事件生效，并在程序启动后执行解析操作
+     * @param jobZookeeperProperties
+     * @param zookeeperRegistryCenter
+     * @return
+     */
     @Bean
-    public ElasticJobConfParser elasticJobConfParser(JobZookeeperProperties jobZookeeperProperties) {
-        return new ElasticJobConfParser(jobZookeeperProperties);
+    public ElasticJobConfParser elasticJobConfParser(JobZookeeperProperties jobZookeeperProperties,
+                                                     ZookeeperRegistryCenter zookeeperRegistryCenter) {
+        return new ElasticJobConfParser(jobZookeeperProperties, zookeeperRegistryCenter);
     }
 }

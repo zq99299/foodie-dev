@@ -29,12 +29,12 @@ public @interface ElasticJobConfig {
      *
      * @return
      */
-    String cron() default "";
+    String cron();
 
     /**
      * 作业分片总数
      */
-    int shardingTotalCount();
+    int shardingTotalCount() default 1;
 
     /**
      * 分片序列号和参数用等号分隔，多个键值对用逗号分隔
@@ -42,7 +42,7 @@ public @interface ElasticJobConfig {
      * 如：
      * 0=a,1=b,2=c
      */
-    int shardingItemParameters();
+    String shardingItemParameters() default "";
 
     /**
      * 作业自定义参数
@@ -51,7 +51,7 @@ public @interface ElasticJobConfig {
      *
      * @return
      */
-    String jobParameter();
+    String jobParameter() default "";
 
     /**
      * 是否开启任务执行失效转移，开启表示如果作业在一次任务执行中途宕机，允许将该次未完成的任务在另一作业节点上补偿执行
@@ -68,7 +68,7 @@ public @interface ElasticJobConfig {
     /**
      * 作业描述信息
      */
-    String description();
+    String description() default "";
 
     // ~======  作业配置 常用 属性
 
@@ -143,10 +143,10 @@ public @interface ElasticJobConfig {
      * 作业分片策略实现类全路径
      * 默认使用平均分配策略
      * 详情参见：作业分片策略 https://shardingsphere.apache.org/elasticjob/legacy/lite-2.x/02-guide/job-sharding-strategy/
-     *
+     * 默认的是 com.dangdang.ddframe.job.lite.api.strategy.impl.AverageAllocationJobShardingStrategy
      * @return
      */
-    String jobShardingStrategyClass();
+    String jobShardingStrategyClass() default "";
 
     /**
      * 修复作业服务器不一致状态服务调度间隔时间，配置为小于 1 的任意值表示不执行修复
@@ -161,16 +161,32 @@ public @interface ElasticJobConfig {
      *
      * @return
      */
-    String eventTraceRdbDataSource();
+    String eventTraceRdbDataSource() default "";
+
+    /**
+     * 作业是否禁止启动
+     * 可用于部署作业时，先禁止启动，部署结束后统一启动
+     *
+     * @return
+     */
+    boolean disabled() default false;
 
     // ~========  作业监听配置 常用属性
 
     /**
-     * 前置后置任务分布式监听实现类，需继承 AbstractDistributeOnceElasticJobListener 类
+     * 自定义监听器：需要实现 ElasticJobListener 接口
      *
      * @return
      */
     String listenerClass() default "";
+
+    /**
+     * 前置后置任务分布式监听实现类，需继承 AbstractDistributeOnceElasticJobListener 类
+     * 只会在分布式任务中执行一次; class 类名
+     *
+     * @return
+     */
+    String distributedListener() default "";
 
     /**
      * 最后一个作业执行前的执行方法的超时时间
