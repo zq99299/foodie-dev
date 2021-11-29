@@ -106,7 +106,7 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
             // ack 为 true 表示 MQ 已经确认收到消息
             // 只有当时 可靠性消息类型的时候，才会更新数据库日志信息
             // 当 ack 为 true 的时候，则更新日志
-            if (MessageType.RELIANT == messageType) {
+            if (MessageType.RELIANT.equals(messageType)) {
                 messageStoreService.success(messageId);
             }
             log.info("#RabbitTemplateContainer.confirm# send message is OK, confirm messageId: {},sendTime: {}", messageId, sendTime);
