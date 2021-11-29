@@ -1,5 +1,6 @@
 package cn.mrcode.rabbit.producer.autoconfigure;
 
+import cn.mrcode.rabbit.task.annotation.EnableElasticJob;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,5 +12,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan({"cn.mrcode.rabbit.producer.*"})
+@EnableElasticJob
 public class RabbitProducerAutoConfiguration {
 }

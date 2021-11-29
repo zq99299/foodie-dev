@@ -43,10 +43,12 @@ public class RabbitBrokerImpl implements RabbitBroker {
         AsyncBaseQueue.submit(() -> {
             String topic = message.getTopic();
             String routingKey = message.getRoutingKey();
-            // 消息唯一 ID, 基础框架再次封装：xx#xx 的格式
-            CorrelationData correlationData = new CorrelationData(String.format("%s#%s",
+            // 消息唯一 ID, 基础框架再次封装：xx#xx#xx 的格式
+            CorrelationData correlationData = new CorrelationData(String.format("%s#%s#%s",
                     message.getMessageId(),
-                    System.currentTimeMillis()));
+                    System.currentTimeMillis(),
+                    message.getMessageType() // 将消息类型封装在 ID 里面
+            ));
 
             // 从池中获取
             RabbitTemplate rabbitTemplate = rabbitTemplateContainer.getTemplate(message);
@@ -63,20 +65,27 @@ public class RabbitBrokerImpl implements RabbitBroker {
 
     @Override
     public void reliantSend(Message message) {
-        // 1. 记录数据库的消息日志
-        Date now = new Date();
-        BrokerMessage brokerMessage = new BrokerMessage();
-        brokerMessage.setMessageId(message.getMessageId());
-        brokerMessage.setStatus(BrokerMessageStatus.SENDING.getCode());
-        // 尝试重试的次数，初始为 0
-        brokerMessage.setTryCount(0);
-        // 下一次重试时间
-        brokerMessage.setNextRetry(DateUtils.addMinutes(now, BrokerMessageConstant.TIMEOUT));
+        String messageId = message.getMessageId();
+        BrokerMessage bm = messageStoreService.selectByMessageId(messageId);
+        // 如果该消息在数据库日志中不存在，则新增一条日志信息
+        // 因为在消息重试的时候，也会调用该方法，所以需要判断一下
+        // 重试消息不入库新的日志信息：一条消息就只能有一条日志数据
+        if (bm == null) {
+            // 1. 记录数据库的消息日志
+            Date now = new Date();
+            BrokerMessage brokerMessage = new BrokerMessage();
+            brokerMessage.setMessageId(message.getMessageId());
+            brokerMessage.setStatus(BrokerMessageStatus.SENDING.getCode());
+            // 尝试重试的次数，初始为 0
+            brokerMessage.setTryCount(0);
+            // 下一次重试时间
+            brokerMessage.setNextRetry(DateUtils.addMinutes(now, BrokerMessageConstant.TIMEOUT));
 
-        brokerMessage.setCreateTime(now);
-        brokerMessage.setUpdateTime(now);
-        brokerMessage.setMessage(message);
-        messageStoreService.insert(brokerMessage);
+            brokerMessage.setCreateTime(now);
+            brokerMessage.setUpdateTime(now);
+            brokerMessage.setMessage(message);
+            messageStoreService.insert(brokerMessage);
+        }
 
         message.setMessageType(MessageType.RELIANT);
         // 2. 发送消息

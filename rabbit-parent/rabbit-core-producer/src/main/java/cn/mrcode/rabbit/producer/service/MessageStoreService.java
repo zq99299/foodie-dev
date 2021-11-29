@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author mrcode
@@ -49,5 +50,34 @@ public class MessageStoreService {
                 messageId,
                 BrokerMessageStatus.SEND_FALL.getCode(),
                 new Date());
+    }
+
+    /**
+     * 根据状态抓取已经超时的数据
+     *
+     * @param status
+     * @return
+     */
+    public List<BrokerMessage> fetchTimeOutMessage4Retry(BrokerMessageStatus status) {
+        return brokerMessageMapper.queryBrokerMessageStatus4Timeout(status.getCode());
+    }
+
+    /**
+     * 将此消息的重试次数加 1
+     *
+     * @param messageId
+     */
+    public void updateTryCount(String messageId) {
+        brokerMessageMapper.update4TryCount(messageId, new Date());
+    }
+
+    /**
+     * 按消息 ID 查询消息日志
+     *
+     * @param messageId
+     * @return
+     */
+    public BrokerMessage selectByMessageId(String messageId) {
+        return brokerMessageMapper.selectByPrimaryKey(messageId);
     }
 }

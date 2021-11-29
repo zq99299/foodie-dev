@@ -18,5 +18,9 @@ public interface RabbitBroker {
 
     void confirmSend(Message message);
 
+    /**
+     * 可靠性消息投递；会往数据库写入一条消息日志信息
+     * @param message
+     */
     void reliantSend(Message message);
 }

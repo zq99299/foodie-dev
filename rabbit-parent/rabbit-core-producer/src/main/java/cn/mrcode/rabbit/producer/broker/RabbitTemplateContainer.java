@@ -100,12 +100,19 @@ public class RabbitTemplateContainer implements RabbitTemplate.ConfirmCallback {
         List<String> idItems = splitter.splitToList(correlationData.getId());
         String messageId = idItems.get(0);
         long sendTime = Long.parseLong(idItems.get(1));
+        String messageType = idItems.get(2); // 获取到消息类型
+
         if (ack) {
             // ack 为 true 表示 MQ 已经确认收到消息
+            // 只有当时 可靠性消息类型的时候，才会更新数据库日志信息
             // 当 ack 为 true 的时候，则更新日志
-            messageStoreService.success(messageId);
+            if (MessageType.RELIANT == messageType) {
+                messageStoreService.success(messageId);
+            }
             log.info("#RabbitTemplateContainer.confirm# send message is OK, confirm messageId: {},sendTime: {}", messageId, sendTime);
         } else {
+            // 发送失败，暂时不用管，你自己实现框架的时候再做一些更细致的逻辑操作
+            // 这里不管的话，现在的逻辑就会在任务重试里面对超时的任务进行重试，直到重试到最大次数时，就会最终失败
             log.error("#RabbitTemplateContainer.confirm# send message is Fail, confirm messageId: {},sendTime: {},cause: {}", messageId, sendTime, cause);
         }
     }
