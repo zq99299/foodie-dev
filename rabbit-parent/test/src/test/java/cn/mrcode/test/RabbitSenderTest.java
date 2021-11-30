@@ -34,7 +34,7 @@ public class RabbitSenderTest {
 
         // 休眠 15 秒，因为有一些事件回调，等待他们的回调
         try {
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.SECONDS.sleep(60);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

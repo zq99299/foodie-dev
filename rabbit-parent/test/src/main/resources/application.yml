@@ -22,6 +22,9 @@ spring:
     # 默认是 / ，可以按不同的项目来分
     virtual-host: /
     connection-timeout: 15s
+    # 这两个属性很重要，不设置的话， confirm 方法就不会生效
+    publisher-returns: true
+    publisher-confirm-type: correlated
 
 elastic:
   job:

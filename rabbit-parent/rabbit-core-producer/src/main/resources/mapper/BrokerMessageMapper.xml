@@ -116,7 +116,7 @@
     </update>
     <update id="changeBrokerMessageStatus" parameterType="cn.mrcode.rabbit.producer.entity.BrokerMessage">
         update broker_message
-        set status = status = #{status,jdbcType=VARCHAR},
+        set `status` = #{messageStatus,jdbcType=VARCHAR},
             update_time = #{updateTime,jdbcType=TIMESTAMP}
         where message_id = #{messageId,jdbcType=VARCHAR}
     </update>
@@ -125,7 +125,7 @@
         <include refid="Base_Column_List" />
         from broker_message
         where `status` = #{messageStatus,jdbcType=VARCHAR}
-                and next_retry &lt; sysdaate()
+                and next_retry &lt; now()
     </select>
     <select id="queryBrokerMessageStatus" resultMap="BaseResultMap">
         select
@@ -136,8 +136,9 @@
     <update id="update4TryCount">
         update broker_message
         set
-            try_count = #{tryCount,jdbcType=INTEGER},
-            update_time = #{updateTime,jdbcType=TIMESTAMP}
+            try_count = try_count+1,
+            update_time = #{updateTime,jdbcType=TIMESTAMP},
+            next_retry = #{nextRetry,jdbcType=TIMESTAMP}
         where message_id = #{messageId,jdbcType=VARCHAR}
     </update>
 </mapper>

@@ -66,9 +66,10 @@ public class MessageStoreService {
      * 将此消息的重试次数加 1
      *
      * @param messageId
+     * @param nextRetry 下一次尝试的时间
      */
-    public void updateTryCount(String messageId) {
-        brokerMessageMapper.update4TryCount(messageId, new Date());
+    public void updateTryCount(String messageId, Date nextRetry) {
+        brokerMessageMapper.update4TryCount(messageId, new Date(), nextRetry);
     }
 
     /**

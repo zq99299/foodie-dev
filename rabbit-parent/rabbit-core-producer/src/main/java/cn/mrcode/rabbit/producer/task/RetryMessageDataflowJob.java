@@ -1,6 +1,7 @@
 package cn.mrcode.rabbit.producer.task;
 
 import cn.mrcode.rabbit.producer.broker.RabbitBroker;
+import cn.mrcode.rabbit.producer.constant.BrokerMessageConstant;
 import cn.mrcode.rabbit.producer.constant.BrokerMessageStatus;
 import cn.mrcode.rabbit.producer.entity.BrokerMessage;
 import cn.mrcode.rabbit.producer.mapper.BrokerMessageMapper;
@@ -9,9 +10,11 @@ import cn.mrcode.rabbit.task.annotation.ElasticJobConfig;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.dataflow.DataflowJob;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,7 +65,7 @@ public class RetryMessageDataflowJob implements DataflowJob<BrokerMessage> {
                 continue;
             }
             // 还可以进行重试，则先更新一次重试数量，然后发起重新投递消息
-            messageStoreService.updateTryCount(message.getMessageId());
+            messageStoreService.updateTryCount(message.getMessageId(), DateUtils.addMinutes(new Date(), BrokerMessageConstant.TIMEOUT));
             rabbitBroker.reliantSend(message.getMessage());
         }
     }

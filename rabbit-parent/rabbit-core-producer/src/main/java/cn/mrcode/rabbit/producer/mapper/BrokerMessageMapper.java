@@ -31,5 +31,15 @@ public interface BrokerMessageMapper {
 
     List<BrokerMessage> queryBrokerMessageStatus(@Param("messageStatus") String messageStatus);
 
-    int update4TryCount(@Param("messageId") String messageId, @Param("updateTime") Date updateTime);
+    /**
+     * 增加尝试的次数，执行一次增加 1 次
+     * @param messageId
+     * @param updateTime
+     * @param nextRetry 下一次尝试的时间
+     * @return
+     */
+    int update4TryCount(@Param("messageId") String messageId,
+                        @Param("updateTime") Date updateTime,
+                        @Param("nextRetry") Date nextRetry
+    );
 }
