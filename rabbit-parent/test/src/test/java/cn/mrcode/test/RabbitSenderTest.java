@@ -39,4 +39,22 @@ public class RabbitSenderTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void delayedSender() {
+        Message message = MessageBuilder.create()
+                .withMessageType(MessageType.RELIANT)
+                .withTopic("delayed-exchange")
+                .withRoutingKey("delay.abc")
+                .withDelayMills(10000) // 10 秒后进入队列
+                .build();
+        producerClient.send(message);
+
+        // 休眠 15 秒，因为有一些事件回调，等待他们的回调
+        try {
+            TimeUnit.SECONDS.sleep(60);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -36,6 +36,14 @@ public class RabbitMessageConverter implements MessageConverter {
         // 在写出前，定制自己的逻辑
         // 比如，可以设置消息过期时间、设置成 utf8 格式等，messageProperties 中有很多 rabbit 相关的东西可以set
         // messageProperties.setExpiration(String.valueOf(1000 * 60));
+        cn.mrcode.rabbit.api.Message message = (cn.mrcode.rabbit.api.Message) object;
+        int delayMills = message.getDelayMills();
+        // 如果设置了延迟时间，则增加延迟插件的头
+        if (delayMills > 0) {
+//            messageProperties.setHeader("x-delay", delayMills);
+            // 上面手动设置等同于下面使用 API
+            messageProperties.setDelay(delayMills);
+        }
         return delegate.toMessage(object, messageProperties);
     }
 
