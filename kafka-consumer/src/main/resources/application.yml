@@ -1,0 +1,40 @@
+server:
+  port: 8002
+  tomcat:
+    uri-encoding: utf-8
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+
+  # kafka 配置
+  kafka:
+    # 集群地址
+    bootstrap-servers: 127.0.0.1:9092
+    consumer:
+      # ack 机制：消费者在消费完消息之后，如何做 ack
+      ## 生产中一般不会使用自动确认，使用手动确认，在消息失败时，还能做一些重试等策略
+      enable-auto-commit: false
+
+      # 消费者在读取一个没有偏移量的分区或则偏移量无效的情况下如何处理
+      ## latest (默认值)：在偏移量无效的情况下，消费者将从最新的记录开始读取数据（在消费者启动之后生成的记录）
+      ## earliest：在偏移量无效的情况下，消费者将从起始位置读取分区记录
+      auto-offset-reset: earliest
+
+      # 消息序列化配置, 默认配置就是 StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+
+    listener:
+      # 手工签收
+      ack-mode: manual
+      # 消费者并行度，启动几个线程消费
+      concurrency: 5
+

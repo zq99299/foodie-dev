@@ -1,0 +1,35 @@
+server:
+  port: 8001
+  tomcat:
+    uri-encoding: utf-8
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+
+  # kafka 配置
+  kafka:
+    # 集群地址
+    bootstrap-servers: 127.0.0.1:9092
+    producer:
+      # 消息发送失败时的重试次数
+      retries: 0
+      # 批量发送数据：太小不利于吞吐量
+      batch-size: 16384
+      # 内存缓冲区大小：官方推荐 32M
+      buffer-memory: 33554432
+      # 消息序列化配置, 默认配置就是 StringSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      # 生产端最重要的配置
+      ## 0: 生产者在成功写入消息之前不会等待任何来自服务器的响应
+      ## 1：只要集群的首领节点收到消息，生产者就会收到一个来自服务器成功响应
+      ## -1：表示分区 leader 必须等待消息被成功写入到所有的 ISR 副本（同步副本）中才认为 producer 请求成功。该方案提供最高的消息持久性保证，但是理论上性能是最差的
+      acks: 0
