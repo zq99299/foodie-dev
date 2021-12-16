@@ -1,0 +1,15 @@
+server:
+  port: 8003
+  tomcat:
+    uri-encoding: utf-8
+
+spring:
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+

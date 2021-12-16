@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    configuration 上的属性含义请参考官方配置文件的 Configuration Syntax 章节（https://logging.apache.org/log4j/2.0/manual/configuration.html#ConfigurationSyntax）
+    monitorInterval: 间隔多少秒会检查一次配置文件是否有修改，有的话则使用最新的配置
+    status：log4j 内部的日志信息，比如你想看归档文件执行日志信息，可以设置为 trace
+ -->
+<Configuration xmlns="http://logging.apache.org/log4j/2.0/config"
+               status="INFO" monitorInterval="600">
+    <Properties>
+        <!-- 输出日志目录 -->
+        <Property name="LOG_HOME">logs</Property>
+        <!-- 输出日志的文件名 -->
+        <Property name="FILE_NAME">collector</Property>
+        <!-- 日志信息如何输出，按什么格式输出 -->
+        <Property name="patternLayout">[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZZ}] [%level{length=5}] [%thread-%tid] [%logger] [%X{hostName}] [%X{ip}] [%X{applicationName}] [%F,%L,%C,%M] [%m] ## '%ex'%n
+        </Property>
+    </Properties>
+    <!-- 使用特定的插件功能
+        https://logging.apache.org/log4j/2.0/manual/configuration.html#Appenders
+        关于具体的 appender 可以参考该 https://logging.apache.org/log4j/2.0/manual/appenders.html
+    -->
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+            <!-- 使用我们上面定义的日志格式输出 -->
+            <PatternLayout pattern="${patternLayout}"></PatternLayout>
+        </Console>
+        <!--
+          fileName: 写出的日志文件名称
+          filePattern：归档文件的名称，里面接收 SimpleDateFormat 的格式化信息和 %i 的计数器，比如按文件大小归档为 5 个，这里计数器就用上了
+        -->
+        <!-- 输出全量日志配置 -->
+        <RollingRandomAccessFile
+                name="appAppender"
+                fileName="${LOG_HOME}/app-${FILE_NAME}.log"
+                filePattern="${LOG_HOME}/app-${FILE_NAME}-%d{yyy-MM-dd}-%i.log"
+        >
+            <PatternLayout pattern="${patternLayout}"></PatternLayout>
+            <Policies>
+                <!--时间策略：interval 翻转文件的间隔，以日期模式中的单位为准，
+                    比如上面是 %d{yyy-MM-dd} 这里最小单位是天，就以 1 天为单位归档日志文件
+                 -->
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <!-- 按文件大小归档 -->
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <!-- 最多保留多少个归档文件，如果超过则删除时间较老的文档 -->
+            <DefaultRolloverStrategy max="20"></DefaultRolloverStrategy>
+        </RollingRandomAccessFile>
+        <!-- 输出错误级别日志配置 -->
+        <RollingRandomAccessFile
+                name="errorAppender"
+                fileName="${LOG_HOME}/error-${FILE_NAME}.log"
+                filePattern="${LOG_HOME}/error-${FILE_NAME}-%d{yyy-MM-dd}-%i.log"
+        >
+            <PatternLayout pattern="${patternLayout}"></PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"></DefaultRolloverStrategy>
+            <!--
+             过滤器
+             https://logging.apache.org/log4j/2.0/manual/filters.html
+            -->
+            <Filters>
+                <!--
+                阀值过滤器：
+                level：匹配的有效日志级别
+                onMatch：匹配时要采取的操作：ACCEPT（接受）, DENY（拒绝） or NEUTRAL（中立），默认是中立
+                onMismatch：不匹配时采取的操作：默认是拒绝
+                如果 LogEvent 中的级别与配置的级别相同或更具体，则此过滤器返回 onMatch 结果，否则返回 onMismatch 值。
+                例如，如果 ThresholdFilter 配置了 Level ERROR 并且 LogEvent 包含 Level DEBUG，那么将返回 onMismatch 值，因为 ERROR 事件比 DEBUG 更具体。
+                    也就是说：这里拒绝之后，就不会记录 debug 的日志信息，而是会记录 error 的日志信息
+                -->
+                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"></ThresholdFilter>
+            </Filters>
+        </RollingRandomAccessFile>
+    </Appenders>
+    <!--
+    日志记录器
+    异步日志记录器：https://logging.apache.org/log4j/2.0/manual/async.html
+    -->
+    <Loggers>
+        <!--
+           异步日志记录器, 这个相关属性在官方文档中没有怎么找到，有点困惑
+           name：指定包名
+           level: 日志级别
+         -->
+        <AsyncLogger name="cn.mrcode.kafka.collector.*" level="info" includeLocation="true">
+            <!-- 这里引用 appAppender -->
+            <AppenderRef ref="appAppender"/>
+        </AsyncLogger>
+        <AsyncLogger name="cn.mrcode.kafka.collector.*" level="info" includeLocation="true">
+            <!--
+                这里引用 errorAppender,
+                这里指定日志级别是 info,再试在 errorAppender 中设置了过滤器
+                所以最终还是只会记录 warn 以上级别的日志信息
+             -->
+            <AppenderRef ref="errorAppender"/>
+        </AsyncLogger>
+        <!-- 启用哪些 appender
+          level: 设置全局默认的日志级别，如果 appAppender 中有配置则以 appAppender 中的为主
+         -->
+        <Root level="info">
+            <AppenderRef ref="appAppender"/>
+            <AppenderRef ref="appAppender"/>
+            <AppenderRef ref="CONSOLE"/>
+        </Root>
+    </Loggers>
+</Configuration>
