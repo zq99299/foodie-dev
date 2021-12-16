@@ -11,7 +11,9 @@
         <Property name="LOG_HOME">logs</Property>
         <!-- 输出日志的文件名 -->
         <Property name="FILE_NAME">collector</Property>
-        <!-- 日志信息如何输出，按什么格式输出 -->
+        <!-- 日志信息如何输出，按什么格式输出,可以定义的格式请参考文档
+            https://logging.apache.org/log4j/2.x/manual/layouts.html
+         -->
         <Property name="patternLayout">[%d{yyyy-MM-dd'T'HH:mm:ss.SSSZZ}] [%level{length=5}] [%thread-%tid] [%logger] [%X{hostName}] [%X{ip}] [%X{applicationName}] [%F,%L,%C,%M] [%m] ## '%ex'%n
         </Property>
     </Properties>
