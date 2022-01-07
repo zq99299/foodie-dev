@@ -1,6 +1,9 @@
 package cn.mrcode.kafka.collector.web;
 
+import cn.mrcode.kafka.collector.util.InputMDC;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.ThreadContext;
+import org.jboss.logging.MDC;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +31,7 @@ public class IndexController {
      */
     @RequestMapping(value = "/index")
     public String index() {
+        InputMDC.putMDC();
         log.info("我是一条 info 级别的日志");
         log.warn("我是一条 warn 级别的日志");
         log.error("我是一条 error 级别的日志");

@@ -75,7 +75,7 @@
                 例如，如果 ThresholdFilter 配置了 Level ERROR 并且 LogEvent 包含 Level DEBUG，那么将返回 onMismatch 值，因为 ERROR 事件比 DEBUG 更具体。
                     也就是说：这里拒绝之后，就不会记录 debug 的日志信息，而是会记录 error 的日志信息
                 -->
-                <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"></ThresholdFilter>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"></ThresholdFilter>
             </Filters>
         </RollingRandomAccessFile>
     </Appenders>
@@ -106,7 +106,7 @@
          -->
         <Root level="info">
             <AppenderRef ref="appAppender"/>
-            <AppenderRef ref="appAppender"/>
+            <AppenderRef ref="errorAppender"/>
             <AppenderRef ref="CONSOLE"/>
         </Root>
     </Loggers>

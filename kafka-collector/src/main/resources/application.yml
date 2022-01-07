@@ -4,6 +4,8 @@ server:
     uri-encoding: utf-8
 
 spring:
+  application:
+    name: kafka-collector
   http:
     encoding:
       charset: UTF-8

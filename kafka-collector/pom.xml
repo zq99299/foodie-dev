@@ -89,4 +89,34 @@
         </dependency>
 
     </dependencies>
+    <build>
+        <finalName>collector</finalName>
+        <!-- 打包时包含 yml、xml 等资源文件  -->
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.xml</include>
+                </includes>
+                <!-- 是否替换资源中的属性 -->
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- 指定启动类 -->
+                    <mainClass>
+                        cn.mrcode.kafka.collector.Application
+                    </mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
