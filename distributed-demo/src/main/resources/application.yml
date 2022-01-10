@@ -3,6 +3,10 @@ server:
   tomcat:
     uri-encoding: utf-8
 
+logging:
+  level:
+    cn.mrcode.distributed: info
+
 spring:
   application:
     name: distributed-demo

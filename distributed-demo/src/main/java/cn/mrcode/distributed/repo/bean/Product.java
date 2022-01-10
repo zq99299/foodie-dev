@@ -4,14 +4,16 @@ import javax.persistence.*;
 import lombok.Data;
 
 @Data
-@Table(name = "product")
+@Table(name = "`product`")
 public class Product {
-    @GeneratedValue(generator = "JDBC")
     @Id
+    @Column(name = "`id`")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     /**
      * 商品库存数量
      */
+    @Column(name = "`count`")
     private Integer count;
 }

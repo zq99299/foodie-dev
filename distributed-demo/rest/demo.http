@@ -1,0 +1,17 @@
+###
+GET http://localhost:8003/singleLock
+
+###
+GET http://localhost:8003/singleLock
+
+###
+GET http://localhost:8004/singleLock
+
+###
+GET http://localhost:8004/singleLock
+
+### 分布式锁 8003
+GET http://localhost:8003/singleLock-db
+
+### 分布式锁 8004
+GET http://localhost:8004/singleLock-db
