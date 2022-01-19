@@ -23,7 +23,7 @@ public class SchedulerService {
     /**
      * 5 秒发送一次
      */
-    @Scheduled(cron = "0/5 * * * * ?")
+//    @Scheduled(cron = "0/5 * * * * ?")
     public void sendSms() {
         try (
                 RedisLock redisLock = new RedisLock(redisTemplate, "autoSendSms", 30);
