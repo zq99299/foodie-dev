@@ -1,0 +1,19 @@
+###
+GET http://localhost:8003/redisLock
+
+###
+GET http://localhost:8004/redisLock
+
+
+### 8003 使用封装后的 redis lock
+GET http://localhost:8003/redisLock-2
+
+### 8004 使用封装后的 redis lock
+GET http://localhost:8004/redisLock-2
+
+
+### 8003 使用封装后的 redis lock - 自动释放锁
+GET http://localhost:8003/redisLock-3
+
+### 8004 使用封装后的 redis lock - 自动释放锁
+GET http://localhost:8004/redisLock-3
