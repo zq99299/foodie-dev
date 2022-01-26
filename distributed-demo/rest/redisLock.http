@@ -17,3 +17,9 @@ GET http://localhost:8003/redisLock-3
 
 ### 8004 使用封装后的 redis lock - 自动释放锁
 GET http://localhost:8004/redisLock-3
+
+### 8003 redisson-lock
+GET http://localhost:8003/redisson-lock
+
+### 8004 redisson-lock
+GET http://localhost:8004/redisson-lock
