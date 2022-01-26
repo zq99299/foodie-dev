@@ -38,8 +38,9 @@
     <!-- 配置 表分片策略
         t_order_$->{id % 2}: 结果是 t_order_0,t_order_1
         但是我们的表示从 1 开始，所以要改成 t_order_$->{id % 2 + 1}
+        sharding-column: 分片列
     -->
-    <sharding:inline-strategy id="orderTableStrategy" sharding-column="order_id"
+    <sharding:inline-strategy id="orderTableStrategy" sharding-column="id"
                               algorithm-expression="t_order_$->{id % 2 + 1}"/>
 
     <!-- 配置 sharding 数据源-->
