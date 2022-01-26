@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:sharding="http://shardingsphere.apache.org/schema/shardingsphere/sharding"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+                        http://shardingsphere.apache.org/schema/shardingsphere/sharding
+                        http://shardingsphere.apache.org/schema/shardingsphere/sharding/sharding.xsd
+                        http://www.springframework.org/schema/context
+                        http://www.springframework.org/schema/context/spring-context.xsd
+                        http://www.springframework.org/schema/tx
+                        http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!-- 配置数据源: 使用的是 DATAJPA 中依赖的数据源 HikariDataSource-->
+    <bean id="ds0" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3307/sharding-order?serverTimezone=Asia/Shanghai&amp;useSSL=true"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+    <bean id="ds1" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3308/shard-order?serverTimezone=Asia/Shanghai&amp;useSSL=true"/>
+        <property name="username" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+    <!-- 配置 数据库分片策略
+           inline-strategy：行表达式分片策略
+           sharding-column：分片列
+           algorithm-expression：算法表达式，ds$->{user_id % 2} 结果会是 ds0 或 ds1
+    -->
+    <sharding:inline-strategy id="databaseStrategy" sharding-column="user_id"
+                              algorithm-expression="ds$->{user_id % 2}"/>
+    <!-- 配置 表分片策略
+        t_order_$->{id % 2}: 结果是 t_order_0,t_order_1
+        但是我们的表示从 1 开始，所以要改成 t_order_$->{id % 2 + 1}
+    -->
+    <sharding:inline-strategy id="orderTableStrategy" sharding-column="order_id"
+                              algorithm-expression="t_order_$->{id % 2 + 1}"/>
+
+    <!-- 配置 sharding 数据源-->
+    <sharding:data-source id="shardingDataSource">
+        <!-- 分片规则 ，指向上面的数据源-->
+        <sharding:sharding-rule data-source-names="ds0,ds1">
+            <!-- 配置分片表规则 -->
+            <sharding:table-rules>
+                <!-- 配置具体表的分片规则
+                    logic-table：逻辑表
+                    actual-data-nodes：实际的数据节点，数据源.表名，$->{0..1} 这个语法其实是  ${0..1}，为了和 spring 的 dsl 不冲突中间增加了箭头
+                        ds$->{0..1}.t_order_$->{0..1}，这个会生成：ds0.t_order_1、ds0.t_order_2、ds1.t_order_1、ds1.t_order_2 4 张表
+                    database-strategy-ref：数据库分片策略
+                    table-strategy-ref：表分片策略
+                -->
+                <sharding:table-rule logic-table="t_order" actual-data-nodes="ds$->{0..1}.t_order_$->{1..2}"
+                                     database-strategy-ref="databaseStrategy"
+                                     table-strategy-ref="orderTableStrategy"/>
+            </sharding:table-rules>
+        </sharding:sharding-rule>
+    </sharding:data-source>
+
+    <!-- 配置 SqlSessionFactoryBean ,使用的是 mybatis 的 -->
+    <bean class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="shardingDataSource"></property>
+        <property name="mapperLocations" value="classpath*:/mapper/*.xml"></property>
+    </bean>
+</beans>
