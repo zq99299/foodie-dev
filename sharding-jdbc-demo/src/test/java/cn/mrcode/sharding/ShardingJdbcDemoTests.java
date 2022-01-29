@@ -34,4 +34,18 @@ public class ShardingJdbcDemoTests {
 
         // 那么这条语句期望是插入到：shard-order.t_order_2 中
     }
+
+    @Test
+    public void testOrder2() {
+        Order order = new Order();
+        // 数据库：userId 偶数分到 sharding-order，奇数分到 shard-order
+        order.setUserId(20);
+        // 表：id 偶数分到 t_order_1, 奇数分到 t_order_2
+        order.setId(2);
+        order.setOrderAmount(BigDecimal.TEN);
+        order.setOrderStatus(1);
+        orderMapper.insertSelective(order);
+
+        // 那么这条语句期望是插入到：sharding-order.t_order_1 中
+    }
 }

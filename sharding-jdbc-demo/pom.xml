@@ -30,7 +30,7 @@
         <repository>
             <id>alimaven</id>
             <name>aliyun maven</name>
-            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+            <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
             <layout>default</layout>
             <snapshots>
                 <enabled>false</enabled>
@@ -81,10 +81,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- for spring namespace -->
+        <!-- for spring boot -->
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-namespace</artifactId>
+            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
             <version>4.0.0</version>
         </dependency>
     </dependencies>
