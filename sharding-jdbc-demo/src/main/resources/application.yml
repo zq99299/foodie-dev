@@ -25,16 +25,17 @@ spring:
       ds0:
         type: com.zaxxer.hikari.HikariDataSource
         driver-class-name: com.mysql.jdbc.Driver
-        jdbcUrl: jdbc:mysql://localhost:3307/sharding-order?serverTimezone=Asia/Shanghai&useSSL=true
+        jdbcUrl: jdbc:mysql://localhost:3307/sharding-order?serverTimezone=Asia/Shanghai&useSSL=true&characterEncoding=utf8
         username: root
         password: root
       ds1:
         type: com.zaxxer.hikari.HikariDataSource
         driver-class-name: com.mysql.jdbc.Driver
-        jdbcUrl: jdbc:mysql://localhost:3308/shard-order?serverTimezone=Asia/Shanghai&useSSL=true
+        jdbcUrl: jdbc:mysql://localhost:3308/shard-order?serverTimezone=Asia/Shanghai&useSSL=true&characterEncoding=utf8
         username: root
         password: root
     sharding:
+      broadcast-tables: area
       # 默认的数据库策略
       # 同样的还有表策略
       default-database-strategy:

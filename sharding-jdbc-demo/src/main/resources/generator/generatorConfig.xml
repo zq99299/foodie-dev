@@ -47,5 +47,7 @@
          -->
         <table schema="sharding-order" tableName="t_order_1" domainObjectName="Order">
         </table>
+        <table schema="sharding-order" tableName="area" domainObjectName="Area">
+        </table>
     </context>
 </generatorConfiguration>

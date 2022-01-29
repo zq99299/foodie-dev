@@ -74,7 +74,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from t_order
+    from t_order_1
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -85,27 +85,27 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from t_order
+    from t_order_1
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from t_order
+    delete from t_order_1
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <delete id="deleteByExample" parameterType="cn.mrcode.sharding.repo.bean.OrderExample">
-    delete from t_order
+    delete from t_order_1
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="cn.mrcode.sharding.repo.bean.Order">
-    insert into t_order (id, order_amount, order_status, 
+    insert into t_order_1 (id, order_amount, order_status, 
       user_id)
     values (#{id,jdbcType=INTEGER}, #{orderAmount,jdbcType=DECIMAL}, #{orderStatus,jdbcType=INTEGER}, 
       #{userId,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="cn.mrcode.sharding.repo.bean.Order">
-    insert into t_order
+    insert into t_order_1
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -135,14 +135,14 @@
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="cn.mrcode.sharding.repo.bean.OrderExample" resultType="java.lang.Long">
-    select count(*) from t_order
+  <select id="countByExample" parameterType="cn.mrcode.sharding.repo.bean.OrderExample" resultType="java.lang.Integer">
+    select count(*) from t_order_1
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update t_order
+    update t_order_1
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=INTEGER},
@@ -162,7 +162,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update t_order
+    update t_order_1
     set id = #{record.id,jdbcType=INTEGER},
       order_amount = #{record.orderAmount,jdbcType=DECIMAL},
       order_status = #{record.orderStatus,jdbcType=INTEGER},
@@ -172,7 +172,7 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="cn.mrcode.sharding.repo.bean.Order">
-    update t_order
+    update t_order_1
     <set>
       <if test="orderAmount != null">
         order_amount = #{orderAmount,jdbcType=DECIMAL},
@@ -187,7 +187,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.mrcode.sharding.repo.bean.Order">
-    update t_order
+    update t_order_1
     set order_amount = #{orderAmount,jdbcType=DECIMAL},
       order_status = #{orderStatus,jdbcType=INTEGER},
       user_id = #{userId,jdbcType=INTEGER}

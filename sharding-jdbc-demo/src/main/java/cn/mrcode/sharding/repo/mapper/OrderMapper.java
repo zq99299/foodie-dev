@@ -2,12 +2,11 @@ package cn.mrcode.sharding.repo.mapper;
 
 import cn.mrcode.sharding.repo.bean.Order;
 import cn.mrcode.sharding.repo.bean.OrderExample;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
 public interface OrderMapper {
-    long countByExample(OrderExample example);
+    int countByExample(OrderExample example);
 
     int deleteByExample(OrderExample example);
 
