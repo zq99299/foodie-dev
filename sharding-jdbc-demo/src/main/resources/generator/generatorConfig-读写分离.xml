@@ -11,7 +11,7 @@
         </commentGenerator>
         <!--数据库链接URL，用户名、密码 -->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://localhost:3307/sharding-order?characterEncoding=utf-8"
+                        connectionURL="jdbc:mysql://localhost:3307/master_order?characterEncoding=utf-8"
                         userId="root"
                         password="root">
             <!-- 如果 table 里面的 catalog 没有配置的话，就取上面 connectionURL 中的数据库名
@@ -45,7 +45,7 @@
              tableName 表名
              domainObjectName：实体类名称
          -->
-        <table schema="sharding-order" tableName="uuid_order_1" domainObjectName="UuidOrder">
+        <table schema="master_order" tableName="m_order_0" domainObjectName="MOrder">
         </table>
     </context>
 </generatorConfiguration>
