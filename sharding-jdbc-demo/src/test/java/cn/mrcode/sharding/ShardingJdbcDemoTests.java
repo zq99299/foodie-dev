@@ -1,10 +1,9 @@
 package cn.mrcode.sharding;
 
-import cn.mrcode.sharding.repo.bean.Area;
-import cn.mrcode.sharding.repo.bean.AreaExample;
-import cn.mrcode.sharding.repo.bean.Order;
-import cn.mrcode.sharding.repo.bean.OrderExample;
+import cn.mrcode.sharding.repo.bean.*;
 import cn.mrcode.sharding.repo.mapper.AreaMapper;
+import cn.mrcode.sharding.repo.mapper.OrderItemMapper;
+import cn.mrcode.sharding.repo.mapper.OrderItemxMapper;
 import cn.mrcode.sharding.repo.mapper.OrderMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -83,11 +82,41 @@ public class ShardingJdbcDemoTests {
     }
 
     @Test
-    public void testGlobalSearch(){
+    public void testGlobalSearch() {
         AreaExample areaExample = new AreaExample();
         areaExample.createCriteria()
                 .andIdEqualTo(2);
         List<Area> areas = areaMapper.selectByExample(areaExample);
         System.out.println(areas.size());
+    }
+
+
+    @Autowired
+    private OrderItemMapper orderItemMapper;
+
+    /**
+     * 绑定表的子表插入数据
+     */
+    @Test
+    public void testBindingTable() {
+        OrderItem order = new OrderItem();
+        // 数据库：userId 偶数分到 sharding-order，奇数分到 shard-order
+        order.setUserId(19);
+        // 表：orderId 偶数分到 t_order_item_1, 奇数分到 t_order_item_2
+        order.setId(1);
+        order.setOrderId(1);
+        order.setProductName("商品 1");
+        orderItemMapper.insertSelective(order);
+
+        // 那么这条语句期望是插入到：shard-order.t_order_item_2 中
+    }
+
+    @Autowired
+    private OrderItemxMapper orderItemxMapper;
+
+    @Test
+    public void testBingdingTables() {
+        List<OrderDetail> details = orderItemxMapper.selectOrder();
+        System.out.println(details);
     }
 }

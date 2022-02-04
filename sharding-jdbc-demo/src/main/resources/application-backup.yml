@@ -1,0 +1,85 @@
+server:
+  port: 8080
+  tomcat:
+    uri-encoding: utf-8
+
+logging:
+  level:
+    cn.mrcode.sharding: info
+
+spring:
+  application:
+    name: sharding-jdbc-demo
+  http:
+    encoding:
+      charset: UTF-8
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    # 仅包含非空的属性值
+    default-property-inclusion: non_null
+  # 全局表、分片表、父子表配置
+  shardingsphere:
+    datasource:
+      names: ds0,ds1
+      ds0:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbcUrl: jdbc:mysql://localhost:3307/sharding-order?serverTimezone=Asia/Shanghai&useSSL=true&characterEncoding=utf8
+        username: root
+        password: root
+      ds1:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        jdbcUrl: jdbc:mysql://localhost:3308/shard-order?serverTimezone=Asia/Shanghai&useSSL=true&characterEncoding=utf8
+        username: root
+        password: root
+    sharding:
+      broadcast-tables:
+        - area
+      # 分片表配置
+      tables:
+        # 逻辑表名
+        # 下面的没有自动提示，可以点击配置属性，会跳转到具体的自动配置文件中
+        # 然后就会看到源码对应的配置类是什么，就知道有哪些属性可以配置了
+        # 比如 org.apache.shardingsphere.core.yaml.config.sharding.YamlTableRuleConfiguration
+        t_order:
+          # 实际节点
+          actual-data-nodes: ds$->{0..1}.t_order_$->{1..2}
+          # 数据库分片策略
+          database-strategy:
+            inline:
+              sharding-column: user_id
+              algorithm-expression: ds$->{user_id % 2}
+          # 表分片策略
+          table-strategy:
+            inline:
+              sharding-column: id
+              algorithm-expression: t_order_$->{id % 2 + 1}
+        # 订单子表的分片规则，设置为和 订单表一样的，表分片字段设置为 order_id
+        t_order_item:
+          # 实际节点
+          actual-data-nodes: ds$->{0..1}.t_order_item_$->{1..2}
+          # 数据库分片策略
+          database-strategy:
+            inline:
+              sharding-column: user_id
+              algorithm-expression: ds$->{user_id % 2}
+          # 表分片策略
+          table-strategy:
+            inline:
+              sharding-column: order_id
+              algorithm-expression: t_order_item_$->{order_id % 2 + 1}
+      # 设置绑定表，左边的为主表，右边的为子表
+      binding-tables:
+        - t_order,t_order_item
+    # 打印 sharding 的 sql 信息
+    props:
+      sql.show: true
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    # 打印sql
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: /mapper/*.xml
+

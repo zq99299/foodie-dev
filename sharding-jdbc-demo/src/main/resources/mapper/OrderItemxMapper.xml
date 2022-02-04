@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.mrcode.sharding.repo.mapper.OrderItemxMapper" >
+    <select id="selectOrder" resultType="cn.mrcode.sharding.repo.bean.OrderDetail">
+        SELECT
+            o.id AS orderId,
+            o.user_id AS userId,
+            item.id AS orderItemId,
+            item.product_name AS productName
+        FROM
+            t_order AS o
+                LEFT JOIN t_order_item AS item ON o.id = item.order_id
+        WHERE
+                o.id IN (
+                1)
+    </select>
+</mapper>
