@@ -41,26 +41,24 @@ spring:
         # 下面的没有自动提示，可以点击配置属性，会跳转到具体的自动配置文件中
         # 然后就会看到源码对应的配置类是什么，就知道有哪些属性可以配置了
         # 比如 org.apache.shardingsphere.core.yaml.config.sharding.YamlTableRuleConfiguration
-        s_order:
+        uuid_order:
           # 实际节点
-          actual-data-nodes: ds$->{0..1}.s_order_$->{1..2}
+          actual-data-nodes: ds$->{0..1}.uuid_order_$->{1..2}
           # 数据库分片策略
           database-strategy:
             inline:
               sharding-column: user_id
               algorithm-expression: ds$->{user_id % 2}
           # 表分片策略
-          # 由于 雪花 ID 是一个 long 类型的，所以可以使用行内表达式
+          # 使用自定义的分片算法
           table-strategy:
-            inline:
+            standard:
               sharding-column: id
-              algorithm-expression: s_order_$->{id % 2 + 1}
+              preciseAlgorithmClassName: cn.mrcode.sharding.sharding.MySharding
           # 主键生成策略
           key-generator:
             column: id
-            type: SNOWFLAKE
-            worker.id: 100
-
+            type: UUID
     # 打印 sharding 的 sql 信息
     props:
       sql.show: true

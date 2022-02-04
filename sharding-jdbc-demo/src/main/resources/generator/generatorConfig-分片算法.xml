@@ -45,7 +45,7 @@
              tableName 表名
              domainObjectName：实体类名称
          -->
-        <table schema="sharding-order" tableName="s_order_1" domainObjectName="SOrder">
+        <table schema="sharding-order" tableName="uuid_order_1" domainObjectName="UuidOrder">
         </table>
     </context>
 </generatorConfiguration>
