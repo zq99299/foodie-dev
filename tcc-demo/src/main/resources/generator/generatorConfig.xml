@@ -25,7 +25,7 @@
             <property name="forceBigDecimals" value="false"></property>
         </javaTypeResolver>
 
-        <javaModelGenerator targetPackage="cn.mrcode.xa.dao.db01.bean" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="cn.mrcode.tcc.dao.db01.bean" targetProject="src/main/java">
             <!-- enableSubPackages:是否让 schema 作为包的后缀 -->
             <property name="enableSubPackages" value="true"/>
             <!-- 从数据库返回的值被清理前后的空格 -->
@@ -34,7 +34,7 @@
         <sqlMapGenerator targetPackage="mapper/db01" targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
         </sqlMapGenerator>
-        <javaClientGenerator targetPackage="cn.mrcode.xa.dao.db01.mapper"
+        <javaClientGenerator targetPackage="cn.mrcode.tcc.dao.db01.mapper"
                              targetProject="src/main/java"
                              type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
