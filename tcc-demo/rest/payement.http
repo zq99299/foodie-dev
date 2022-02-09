@@ -1,0 +1,2 @@
+### 支付接口调用
+GET http://localhost:8080/payment?userId=2&orderId=1&amount=200
