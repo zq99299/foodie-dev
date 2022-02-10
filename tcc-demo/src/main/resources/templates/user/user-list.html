@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>user-list</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+</head>
+<body>
+<table border="1" style="margin: 0 auto; width: 400px">
+    <thead>
+    <tr>
+        <th>用户 ID</th>
+        <th>用户名</th>
+        <th>姓名</th>
+        <th>年龄</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user:${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.username}"></td>
+        <td th:text="${user.sex}"></td>
+        <td th:text="${user.age}"></td>
+        <td>
+            <button type="button" name="del" th:attr="userid=${user.id}">删除</button>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script>
+    $(function () {
+        // 监听 删除 按钮，发起删除请求
+        $(document).on("click", "button[name=del]", function () {
+            var userId = $(this).attr('userId');
+
+            $.get("/user/delUser?userId=" + userId, function (reps) {
+                // 删除成功，则刷新当前页面
+                if (reps.status == 1) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 5000)  // 延迟 5 秒刷新
+                }
+            })
+        })
+    })
+</script>
+</body>
+</html>

@@ -8,6 +8,10 @@ logging:
     cn.mrcode.sharding: info
 
 spring:
+  thymeleaf:
+    # 关闭缓存
+    cache: false
+
   application:
     name: tcc-demo
   http:
