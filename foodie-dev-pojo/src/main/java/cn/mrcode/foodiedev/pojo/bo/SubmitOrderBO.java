@@ -10,6 +10,7 @@ public class SubmitOrderBO {
     private String addressId;
     private Integer payMethod;
     private String leftMsg;
+    private String orderToken;
 
     public String getUserId() {
         return userId;
@@ -49,6 +50,14 @@ public class SubmitOrderBO {
 
     public void setLeftMsg(String leftMsg) {
         this.leftMsg = leftMsg;
+    }
+
+    public String getOrderToken() {
+        return orderToken;
+    }
+
+    public void setOrderToken(String orderToken) {
+        this.orderToken = orderToken;
     }
 
     @Override

@@ -15,6 +15,8 @@ import cn.mrcode.foodiedev.service.OrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,10 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Api(value = "订单相关", tags = {"订单相关 API 接口"})
 @RestController
@@ -38,6 +43,24 @@ public class OrdersController extends BaseController {
     private RestTemplate restTemplate;
     @Autowired
     private RedisOperator redisOperator;
+    @Autowired
+    private RedissonClient redissonClient;
+
+    /**
+     * 这里的业务场景规定为：按 session 来保证唯一，这个可以根据业务需求定义
+     *
+     * @param httpSession
+     * @return
+     */
+    @ApiOperation(value = "用户下单 - toekn 获取", httpMethod = "GET")
+    @PostMapping("/getOrderToken")
+    public JSONResult getOrderToken(HttpSession httpSession) {
+        String token = UUID.randomUUID().toString();
+        // 存入 redis：key 根据业务需求进行，value：就是 token 信息
+        // 设置 60 秒后过期
+        redisOperator.set("ORDER_TOKEN_" + httpSession.getId(), token, 60);
+        return JSONResult.ok(token);
+    }
 
     @ApiOperation(value = "用户下单", notes = "用户下单", httpMethod = "POST")
     @PostMapping("/create")
@@ -45,6 +68,32 @@ public class OrdersController extends BaseController {
             @RequestBody SubmitOrderBO submitOrderBO,
             HttpServletRequest request,
             HttpServletResponse response) {
+        String lockKey = "LOCK_KEY_" + request.getSession().getId();
+        // 加分布式锁，进行处理
+        RLock lock = redissonClient.getLock(lockKey);
+        // 根据订单执行的耗时，设置锁的超时时间
+        lock.lock(5, TimeUnit.SECONDS);
+        try {
+            String orderTokenKey = "ORDER_TOKEN_" + request.getSession().getId();
+            // 在 redis 中获取该值，并判定
+            String orderToken = redisOperator.get(orderTokenKey);
+            if (StringUtils.isBlank(orderToken)) {
+                return JSONResult.errorMsg("orderToken 不存在");
+            }
+            boolean corretToken = orderToken.equals(submitOrderBO.getOrderToken());
+            if (!corretToken) {
+                return JSONResult.errorMsg("orderToken 不正确");
+            }
+            // 需要保证该 token 只能被消费一次,校验完成后删除
+            redisOperator.del(orderTokenKey);
+        } finally {
+            try {
+                // 释放锁有可能报错
+                // 比如你在 debug 的时候，上面锁设置 5 秒就超时，然后超时后，释放锁的话就会异常
+                lock.unlock();
+            } catch (Exception e) {
+            }
+        }
 
         if (submitOrderBO.getPayMethod() != PayMethod.WEIXIN.type
                 && submitOrderBO.getPayMethod() != PayMethod.ALIPAY.type) {
