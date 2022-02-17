@@ -58,4 +58,13 @@ public class DemoController {
         log.info("success, 当前的稳定速率是 {}", limiter.getRate());
         return "success";
     }
+
+    /**
+     * Nginx 专用
+     */
+    @GetMapping("/nginx")
+    public String nginx() {
+        log.info("Nginx success");
+        return "success";
+    }
 }
