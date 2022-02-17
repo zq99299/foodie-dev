@@ -1,0 +1,6 @@
+server:
+  port: 10086
+
+spring:
+  application:
+    name: rate-limiter
