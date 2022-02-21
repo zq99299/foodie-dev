@@ -14,6 +14,12 @@ import org.springframework.data.redis.core.script.DefaultRedisScript;
  */
 @Configuration
 public class RedisConfiguration {
+    /**
+     * 业务方也需要依赖我们这个项目的 jar 包，然后配置 spring-data-redis 的自动配置
+     *
+     * @param factory 这里的 factory 就是自动配置产生的
+     * @return
+     */
     @Bean
     public RedisTemplate<String, String> redisTemplate(
             RedisConnectionFactory factory
@@ -21,6 +27,11 @@ public class RedisConfiguration {
         return new StringRedisTemplate(factory);
     }
 
+    /**
+     * 设置 Lua 脚本信息对象，用于在执行脚本时的引用
+     *
+     * @return
+     */
     @Bean
     public DefaultRedisScript loadRedisScript() {
         DefaultRedisScript redisScript = new DefaultRedisScript();
