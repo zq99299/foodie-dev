@@ -1,0 +1,10 @@
+server:
+  port: 10086
+
+spring:
+  application:
+    name: ratelimiter-test
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
