@@ -1,5 +1,6 @@
 package cn.mrcode.springcloud;
 
+import cn.mrcode.springcloud.annotation.AccessLimiterAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -41,4 +42,10 @@ public class RedisConfiguration {
         redisScript.setResultType(Boolean.class);
         return redisScript;
     }
+
+    @Bean
+    public AccessLimiterAspect accessLimiterAspect() {
+        return new AccessLimiterAspect();
+    }
+
 }

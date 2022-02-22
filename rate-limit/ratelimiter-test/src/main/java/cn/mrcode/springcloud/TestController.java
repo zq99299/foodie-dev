@@ -1,5 +1,6 @@
 package cn.mrcode.springcloud;
 
+import cn.mrcode.springcloud.annotation.AccessLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,14 @@ public class TestController {
         } catch (Exception e) {
             return e.getMessage();
         }
+        log.info("获得执行");
+        return "success";
+    }
+
+    @GetMapping("/test-annotation")
+    // 使用限流注解
+    @AccessLimiter(limit = 1)
+    public String testAnnotation(String none) {
         log.info("获得执行");
         return "success";
     }
