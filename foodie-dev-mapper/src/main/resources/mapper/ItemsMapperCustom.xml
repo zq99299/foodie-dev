@@ -60,7 +60,7 @@
         from items_spec
         group by item_id) tempSpec on tempSpec.item_id = ii.item_id
         <where>
-            i.cat_id = #{catId}
+            i.cat_id = #{paramsMap.catId}
             <if test="paramsMap.keywords != null and paramsMap.keywords != '' ">
                 i.item_name like '%${paramsMap.keywords}%'
             </if>

@@ -140,11 +140,11 @@ public class ItemsController extends BaseController {
                     "        -- k: 默认，根据 name\n" +
                     "        -- c: 根据效率排序\n" +
                     "        -- p: 根据价格排序", required = false)
-            @RequestParam String sort,
+            @RequestParam(required = false) String sort,
             @ApiParam(name = "page", value = "查询下一页的第几页", required = false)
-            @RequestParam Integer page,
+            @RequestParam(required = false) Integer page,
             @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false)
-            @RequestParam Integer pageSize) {
+            @RequestParam(required = false) Integer pageSize) {
 
         if (page == null) {
             page = 1;
