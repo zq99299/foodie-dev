@@ -2,11 +2,56 @@ server:
   port: 8080
 
 spring:
+  application:
+    name: foodie-dev
+  boot:
+    admin:
+      client:
+        url: http://localhost:8090
   datasource:
-    url: jdbc:mysql://localhost:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
+    url: jdbc:mysql://192.168.0.108:3306/foodie-shop-dev?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true
     username: root
     password: root
 
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "info,health,monitoring"
+  metrics:
+    tags:
+      application: prometheus-test
+
+## 可以随意写，形式就是 kv 方式
+info:
+  project-name: foodie-dev
+  author: mrcode
+  owner-email: xxx@qq.com
+
+javamelody:
+  management-endpoint-monitoring-enabled: true
+  # Enable JavaMelody auto-configuration (optional, default: true)
+  enabled: true
+  # 要从监控中排除的数据源名称(可选，用逗号分隔)
+  excluded-datasources: secretSource,topSecretSource
+  # 启用 Spring 服务和控制器的监控(可选，默认值:true)
+  spring-monitoring-enabled: true
+  # JavaMelody 初始化参数(可选)
+  # See: https://github.com/javamelody/javamelody/wiki/UserGuide#6-optional-parameters
+  init-parameters:
+    # 日志请求:
+    log: true
+    # 从监控中排除 url 是 images, css, fonts and js 的文件:
+    #url-exclude-pattern: (/webjars/.*|/css/.*|/images/.*|/fonts/.*|/js/.*)
+    # to aggregate digits in http requests:
+    #http-transform-pattern: \d+
+    # 添加 basic auth 人证
+    #authorized-users: admin:pwd
+    # 更改默认的存储目录
+    #storage-directory: /tmp/javamelody
+    # 修改默认的监控路径 "/monitoring"
+    #monitoring-path: /admin/performance

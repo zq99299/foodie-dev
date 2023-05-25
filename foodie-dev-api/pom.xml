@@ -12,7 +12,7 @@
     <artifactId>foodie-dev-api</artifactId>
     <packaging>jar</packaging>
     <!-- 打包 war 1：由 jar 包改成 war 包 -->
-<!--    <packaging>war</packaging>-->
+    <!--    <packaging>war</packaging>-->
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
@@ -29,5 +29,61 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <!-- 这里引入的版本是 1.1.4 -->
+        </dependency>
+        <dependency>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>2.1.5</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bull.javamelody</groupId>
+            <artifactId>javamelody-spring-boot-starter</artifactId>
+            <version>1.91.0</version>
+        </dependency>
     </dependencies>
+    <build>
+        <!-- 打包设置 -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
+                <!--                <configuration>-->
+                <!--                    &lt;!&ndash; jdk 1.8 编译&ndash;&gt;-->
+                <!--                    <source>${java.version}</source>-->
+                <!--                    <target>${java.version}</target>-->
+                <!--                    &lt;!&ndash; 字符集utf-8&ndash;&gt;-->
+                <!--                    <encoding>${project.build.sourceEncoding}</encoding>-->
+                <!--                </configuration>-->
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.1.18.RELEASE</version>
+                <!-- execution 重点一定要加 repackage-->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <!-- 指定配置文件所在的resource目录 -->
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+    </build>
 </project>

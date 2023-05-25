@@ -1,0 +1,2 @@
+JDK8 垃圾收集日志打印参数
+-Xms50m -Xmx50m -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:-PrintGCCause -Xloggc:./gc.log
